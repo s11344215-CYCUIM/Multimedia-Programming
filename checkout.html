@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>結帳資訊 - 我們的品牌</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+<header class="site-header">
+    <div class="container nav-container">
+        <a href="index.html#adSlider" class="logo">
+            <span class="logo-main">我們的品牌</span>
+            <span class="logo-sub">our brand</span>
+        </a>
+
+        <button class="nav-toggle" id="navToggle" aria-label="切換選單">
+            <span class="nav-toggle-line"></span>
+            <span class="nav-toggle-line"></span>
+        </button>
+
+        <nav class="main-nav" id="mainNav">
+            <a href="index.html#adSlider">首頁</a>
+            <a href="index.html#limited">季節新品</a>
+            <a href="index.html#story">品牌故事</a>
+            <a href="index.html#craftsmen">匠心職人</a>
+            <a href="menu.html">飲品菜單</a>
+            <a href="index.html#about">關於我們</a>
+            <a href="member.html">會員專區</a>
+        </nav>
+    </div>
+</header>
+
+<main class="section checkout-page">
+    <div class="container">
+        <h1 class="page-title">結帳資訊</h1>
+        <p class="page-subtitle">
+            再確認一次品項與數量，並填寫基本聯絡資訊<br>
+        </p>
+
+        <!-- 如果購物車是空的 -->
+        <div id="checkoutEmpty" class="cart-empty-message">
+            目前沒有任何品項可以結帳，<a href="menu.html">回去加點幾杯飲料</a>吧
+        </div>
+
+        <!-- 結帳內容 -->
+        <div id="checkoutContent" class="checkout-content">
+            <!-- 左邊：訂單摘要 -->
+            <section class="checkout-summary-section">
+                <h2 class="checkout-section-title">訂單明細</h2>
+                <div id="checkoutSummary" class="checkout-summary-list">
+                    <!-- 由 script.js 的 renderCheckoutPage() 填入每一項 -->
+                </div>
+                <div class="checkout-summary-total">
+                    <span>總金額</span>
+                    <span id="checkoutTotal">$0</span>
+                </div>
+            </section>
+
+            <!-- 右邊：填寫資料 -->
+            <section class="checkout-form-section">
+                <h2 class="checkout-section-title">取餐與付款資訊</h2>
+                <form id="checkoutForm" class="checkout-form">
+                    <div class="checkout-form-group">
+                        <label for="checkout-name">姓名</label>
+                        <input type="text" id="checkout-name" name="name" required placeholder="請輸入姓名">
+                    </div>
+
+                    <div class="checkout-form-group">
+                        <label for="checkout-phone">聯絡電話</label>
+                        <input type="tel" id="checkout-phone" name="phone" required placeholder="請輸入手機號碼">
+                    </div>
+
+                    <div class="checkout-form-group">
+                        <label for="checkout-date">取餐日期</label>
+                        <input type="date" id="checkout-date" name="date" required>
+                    </div>
+
+                    <div class="checkout-form-group">
+                        <label for="checkout-time">預計取餐時間</label>
+                        <input type="time" id="checkout-time" name="time" required>
+                    </div>
+
+                    <div class="checkout-form-group">
+                        <label>付款方式</label>
+                        <div class="payment-options">
+                            <label class="payment-option">
+                                <input type="radio" name="payment" value="cash" checked>
+                                <span>現金支付</span>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="payment" value="apple_pay">
+                                <span>Apple&nbsp;Pay</span>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="payment" value="line_pay">
+                                <span>LINE&nbsp;Pay</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="checkout-form-group">
+                        <label for="checkout-note">備註</label>
+                        <textarea
+                            id="checkout-note"
+                            name="note"
+                            rows="5"
+                            placeholder="例如：不要塑膠袋、到店前再製作、需要分開裝、或其他需求"
+                        ></textarea>
+                    </div>
+
+                    <button type="submit" class="btn primary-btn">
+                        送出訂單
+                    </button>
+                </form>
+            </section>
+        </div>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-content">
+        <div class="footer-info">
+            <h3 class="footer-title">品牌總部資訊</h3>
+            <p>地址：中原大學的地址</p>
+            <p>電話：我不知道放誰的電話</p>
+            <p>營業時間：我忘記討論的營業時間是啥了</p>
+            <p>Email：我不知道放誰的email</p>
+        </div>
+        <div class="footer-links">
+            <a href="https://www.cycu.edu.tw" target="_blank" rel="noopener" class="footer-social-link">
+                <span class="footer-ig-icon" aria-hidden="true"></span>
+                <span>Instagram</span>
+            </a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <div class="container">
+            <p>© 2025 CYCUTEA All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<a href="cart.html" class="fab cart-floating" aria-label="購物車">
+    🛒
+    <span class="cart-count-badge" id="cartCount">0</span>
+</a>
+
+</body>
+</html>

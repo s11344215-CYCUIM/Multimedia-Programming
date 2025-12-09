@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>購物車 - 我們的品牌</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+<header class="site-header">
+    <div class="container nav-container">
+        <a href="index.html#adSlider" class="logo">
+            <span class="logo-main">我們的品牌</span>
+            <span class="logo-sub">our brand</span>
+        </a>
+
+        <button class="nav-toggle" id="navToggle" aria-label="切換選單">
+            <span class="nav-toggle-line"></span>
+            <span class="nav-toggle-line"></span>
+        </button>
+
+        <nav class="main-nav" id="mainNav">
+            <a href="index.html#adSlider">首頁</a>
+            <a href="index.html#limited">季節新品</a>
+            <a href="index.html#story">品牌故事</a>
+            <a href="index.html#craftsmen">匠心職人</a>
+            <a href="menu.html">飲品菜單</a>
+            <a href="index.html#about">關於我們</a>
+            <a href="member.html">會員專區</a>
+        </nav>
+    </div>
+</header>
+
+<main class="section cart-page">
+    <div class="container">
+        <h1 class="page-title">購物車</h1>
+        <p class="page-subtitle">
+            這裡可以調整數量、刪除品項，再進行結帳流程。
+        </p>
+
+        <!-- 空購物車提示 -->
+        <div id="cartEmpty" class="cart-empty-message">
+            購物車目前是空的，<a href="menu.html">先去逛逛飲料</a>吧。
+        </div>
+
+        <!-- 購物車列表 -->
+        <div id="cartList" class="cart-list">
+            <!-- 由 script.js 的 renderCartPage() 動態產生 -->
+        </div>
+
+        <!-- 小計與結帳按鈕 -->
+        <aside id="cartSummary" class="cart-summary">
+            <div class="cart-summary-row">
+                <span>小計</span>
+                <span id="cartSubtotal">$0</span>
+            </div>
+            <p class="cart-summary-note">
+                目前為課程專案示意，實際不會進行金流或出貨。
+            </p>
+            <a id="checkoutBtn" href="checkout.html" class="btn primary-btn">
+                前往結帳
+            </a>
+        </aside>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-content">
+        <div class="footer-info">
+            <h3 class="footer-title">品牌總部資訊</h3>
+            <p>地址：中原大學的地址</p>
+            <p>電話：我不知道放誰的電話</p>
+            <p>營業時間：我忘記討論的營業時間是啥了</p>
+            <p>Email：我不知道放誰的email</p>
+        </div>
+        <div class="footer-links">
+            <a href="https://www.cycu.edu.tw" target="_blank" rel="noopener" class="footer-social-link">
+                <span class="footer-ig-icon" aria-hidden="true"></span>
+                <span>Instagram</span>
+            </a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <div class="container">
+            <p>© 2025 CYCUTEA All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<a href="cart.html" class="fab cart-floating" aria-label="購物車">
+    🛒
+    <span class="cart-count-badge" id="cartCount">0</span>
+</a>
+
+</body>
+</html>

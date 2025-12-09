@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>index.html</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+
+    <!-- Header（上方導覽列) -->
+    <header class="site-header">
+        <div class="container nav-container">
+
+            <!-- Logo（之後可以換成圖片） -->
+            <a href="#" class="logo">
+                <span class="logo-main">我們的品牌</span>
+                <span class="logo-sub">our brand</span>
+            </a>
+
+            <!-- 手機版選單 -->
+            <button class="nav-toggle" id="navToggle" aria-label="切換選單">
+                <span class="nav-toggle-line"></span>
+                <span class="nav-toggle-line"></span>
+            </button>
+
+            <!-- 導覽列項目-->
+            <nav class="main-nav" id="mainNav">
+                <a href="#adSlider">首頁</a>
+                <a href="#limited">季節品項</a>
+                <a href="#story">品牌故事</a>
+                <a href="#craftsmen">匠心職人</a>
+                <a href="menu.html">飲品菜單</a>
+                <a href="#about">關於我們</a>
+                <a href="member.html">會員專區</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 首頁頂部廣告輪播區 -->
+    <section class="ad-slider" id="adSlider">
+        <div class="container ad-slider-inner">
+
+            <!-- 左箭頭 -->
+            <button class="ad-arrow ad-prev" aria-label="上一則廣告">
+                ‹
+            </button>
+
+            <!-- 中間輪播內容 -->
+            <div class="ad-slides">
+
+                <!-- 第1則廣告 -->
+                <article class="ad-slide active">
+                    <div class="ad-tag">最新活動</div>
+                    <h3 class="ad-title">最新活動的標題</h3>
+                    <p class="ad-text">
+                        想不到有啥最新活動，內容可以打在這
+                    </p>
+                </article>
+
+                <!-- 第2則廣告 -->
+                <article class="ad-slide">
+                    <div class="ad-tag">人氣推薦</div>
+                    <h3 class="ad-title">人氣推薦的飲料</h3>
+                    <p class="ad-text">
+                        人氣飲料的內容
+                    </p>
+                </article>
+
+                <!-- 第3則廣告 -->
+                <article class="ad-slide">
+                    <div class="ad-tag">會員福利</div>
+                    <h3 class="ad-title">會員福利的標題</h3>
+                    <p class="ad-text">
+                        我不知道有啥福利
+                    </p>
+                </article>
+
+                <!-- 第4則廣告 -->
+                <article class="ad-slide">
+                    <div class="ad-tag">想不到了</div>
+                    <h3 class="ad-title">想不到了</h3>
+                    <p class="ad-text">
+                        想不到了
+                    </p>
+                </article>
+
+                <!-- 第5則廣告 -->
+                <article class="ad-slide">
+                    <div class="ad-tag">不知道寫啥</div>
+                    <h3 class="ad-title">想不到了</h3>
+                    <p class="ad-text">
+                        想不到了
+                    </p>
+                </article>
+            </div>
+
+            <!-- 右箭頭 -->
+            <button class="ad-arrow ad-next" aria-label="下一則廣告">
+                ›
+            </button>
+        </div>
+    </section>
+
+    <!-- Hero（主視覺區） -->
+    <section class="hero" id="hero">
+        <div class="hero-overlay"></div>
+
+        <div class="container hero-content">
+            <p class="hero-tagline">小標語放這</p>
+
+            <h1 class="hero-title">重點標語放這，你們看這排版行不</h1>
+
+            <p class="hero-text">
+                來點厲害一點的形容<br>
+                來點厲害一點的形容part2
+            </p>
+
+            <div class="hero-actions">
+                <a href="#limited" class="btn primary-btn">看看本季新品</a>
+                <a href="#story" class="btn ghost-btn">了解品牌故事</a>
+            </div>
+        </div>
+    </section>
+
+    <main>
+
+        <!--  季節限定飲品 -->
+        <section class="section" id="limited">
+            <div class="container section-header">
+                <p class="section-tag">SEASONAL</p>
+                <h2 class="section-title">季節限定 blablabla</h2>
+                <p class="section-subtitle">
+                    想到的季節飲料
+                </p>
+            </div>
+
+            <div class="container limited-grid">
+                <!-- 假圖片框（之後可換成 <img>） -->
+                <div class="limited-image-card">
+                    <div class="limited-image-placeholder">
+                        可以放照片在這
+                    </div>
+                </div>
+
+                <!-- 右側文字介紹 -->
+                <div class="limited-info-card">
+                    <h3>飲料名稱</h3>
+                    <p>
+                        稍微形容一下這杯飲料
+                    </p>
+                    <ul class="limited-list">
+                        <li>這杯</li>
+                        <li>飲料</li>
+                        <li>有啥特色</li>
+                    </ul>
+
+                    <!-- 立即訂購 -->
+                    <a href="menu.html" class="btn primary-btn">
+                        立即訂購
+                    </a>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 品牌理念之類的 -->
+        <section class="section section-alt" id="story">
+            <div class="container section-header">
+                <p class="section-tag">ABOUT</p>
+                <h2 class="section-title">我不知道要寫什麼但感覺要有大標題</h2>
+                <p class="section-subtitle">
+                    然後感覺也要有<br>
+                    一點說明小文字
+                </p>
+            </div>
+
+            <!-- 第 1 區塊，圖片左、文字右 -->
+            <div class="container story-block">
+                <div class="story-image">
+                    <div class="story-image-placeholder">
+                        品牌故事圖片
+                    </div>
+                </div>
+                <div class="story-text">
+                    <h3>第一個介紹的主題</h3>
+                    <p>
+                        blablabla blablabla blablabla
+                    </p>
+                    <p>
+                        blablabla blablabla blablabla
+                    </p>
+                </div>
+            </div>
+
+            <!-- 第 2 區塊，圖片右、文字左 -->
+            <div class="container story-block story-block-reverse">
+                <div class="story-image">
+                    <div class="story-image-placeholder">
+                        品牌故事圖片
+                    </div>
+                </div>
+                <div class="story-text">
+                    <h3>第二個介紹的主題</h3>
+                    <p>
+                        blablabla blablabla blablabla
+                    </p>
+                    <p>
+                        blablabla blablabla blablabla
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 匠心職人 -->
+        <section class="section" id="craftsmen">
+            <div class="container section-header">
+                <p class="section-tag">CRAFTSMEN</p>
+                <h2 class="section-title">講一下這些茶葉哪裡厲害之類的</h2>
+                <p class="section-subtitle">
+                    或者我們有多會做茶，畢竟這區是匠心職人
+                </p>
+            </div>
+
+            <div class="container craftsmen-grid">
+                <div class="craftsmen-text">
+                    <p>
+                        嚴選茶葉，手工翻焙，雙重萎凋製程，保留茶葉最佳風味。
+                    </p>
+                    <p>
+                        依照季節調整配方，反覆杯測，記錄每一批茶的個性。(chatgpt支援的)
+                    </p>
+                </div>
+
+                <div class="craftsmen-gallery">
+                    <div class="gallery-item">第一個特點</div>
+                    <div class="gallery-item">第二個特點</div>
+                    <div class="gallery-item">第三個特點</div>
+                    <div class="gallery-item">第四個特點</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===========================
+             關於我們（四位成員）
+        ============================ -->
+        <section class="section about-section" id="about">
+            <div class="container section-header">
+                <p class="section-tag">ABOUT US</p>
+                <h2 class="section-title">關於我們</h2>
+                <p class="section-subtitle">
+                    這裡是預留給每隔人介紹的地方
+                </p>
+            </div>
+
+            <div class="container team-grid">
+                <!-- 成員1 -->
+                <article class="team-card">
+                    <div class="team-photo team-photo-placeholder"></div>
+                    <div class="team-name">成員一</div>
+                    <div class="team-role">職務 / 分工</div>
+                    <p class="team-bio">
+                        這裡可以寫自己的自我介紹，例如負責啥之類的
+                    </p>
+                </article>
+
+                <!-- 成員2 -->
+                <article class="team-card">
+                    <div class="team-photo team-photo-placeholder"></div>
+                    <div class="team-name">成員二</div>
+                    <div class="team-role">職務 / 分工</div>
+                    <p class="team-bio">
+                        這裡可以寫自己的自我介紹，例如負責啥之類的
+                    </p>
+                </article>
+
+                <!-- 成員3 -->
+                <article class="team-card">
+                    <div class="team-photo team-photo-placeholder"></div>
+                    <div class="team-name">成員三</div>
+                    <div class="team-role">職務 / 分工</div>
+                    <p class="team-bio">
+                        這裡可以寫自己的自我介紹，例如負責啥之類的
+                    </p>
+                </article>
+
+                <!-- 成員4 -->
+                <article class="team-card">
+                    <div class="team-photo team-photo-placeholder"></div>
+                    <div class="team-name">成員四</div>
+                    <div class="team-role">職務 / 分工</div>
+                    <p class="team-bio">
+                        這裡可以寫自己的自我介紹，例如負責啥之類的
+                    </p>
+                </article>
+            </div>
+        </section>
+
+        <!-- ===========================
+             加盟專區（表單移到這裡）
+        ============================ -->
+        <section class="section" id="franchise">
+            <div class="container section-header">
+                <p class="section-tag">FRANCHISE</p>
+                <h2 class="section-title">加盟專區</h2>
+                <p class="section-subtitle">
+                    想了解加盟相關資訊，可以先透過下方表單留下聯絡方式與大致需求<br>
+                </p>
+            </div>
+
+            <div class="container">
+                <form class="contact-form">
+                    <label>
+                        姓名
+                        <input type="text" name="name" placeholder="請輸入您的名字">
+                    </label>
+                    <label>
+                        Email
+                        <input type="email" name="email" placeholder="example@mail.com">
+                    </label>
+                    <label>
+                        訊息內容
+                        <textarea name="message" rows="4" placeholder="備註/更多問題"></textarea>
+                    </label>
+                    <button type="submit" class="btn primary-btn">送出表單</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- 回到頂部按鈕 -->
+    <button class="fab back-to-top" id="backToTop" aria-label="回到頂部">
+        ↑
+    </button>
+
+    <!-- 懸浮購物車 -->
+    <a href="cart.html" class="fab cart-floating" aria-label="購物車">
+        🛒
+        <span class="cart-count-badge" id="cartCount">0</span>
+    </a>
+
+    <!-- 頁尾 -->
+    <footer class="site-footer">
+        <div class="container footer-content">
+            <div class="footer-info">
+                <h3 class="footer-title">品牌總部資訊</h3>
+                <p>地址：中原大學的地址</p>
+                <p>電話：我不知道放誰的電話</p>
+                <p>營業時間：我忘記討論的營業時間是啥了</p>
+                <p>Email：我不知道放誰的email</p>
+            </div>
+            <div class="footer-links">
+                <a href="https://www.cycu.edu.tw" target="_blank" rel="noopener" class="footer-social-link">
+                    <span class="footer-ig-icon" aria-hidden="true"></span>
+                    <span>Instagram</span>
+                </a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p>© 2025 CYCUTEA All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
