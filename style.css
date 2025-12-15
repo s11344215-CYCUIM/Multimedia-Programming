@@ -1892,3 +1892,12 @@ body.modal-open .rating-modal-backdrop {
 .drink-rating .my-rating-comment {
     color: #777 !important;
 }
+
+/* 周邊商品提醒僅供現場購買區塊 */
+.merch-note {
+    text-align: center;
+    font-size: 1rem;
+    color: #777;
+    line-height: 1.8;
+    padding: 1rem 0 0.5rem;
+}
