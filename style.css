@@ -1,1254 +1,1330 @@
 /* 網站基礎設定 */
 :root {
-    --color-bg: #0f2018;
-    --color-bg-alt: #f5f1e8;
+  --color-bg: #0f2018;
+  --color-bg-alt: #f5f1e8;
 
-    --color-primary: #144433;
-    --color-primary-rgb: 20, 68, 51; /* 主題色 RGB */
+  --color-primary: #144433;
+  --color-primary-rgb: 20, 68, 51;
+  /* 主題色 RGB */
 
-    --color-primary-light: #1f5b45;
-    --color-accent: #d8a15f;
-    --color-text: #222;
-    --color-text-light: #fdfcf8;
+  --color-primary-light: #1f5b45;
+  --color-accent: #d8a15f;
+  --color-text: #222;
+  --color-text-light: #fdfcf8;
 
-    --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.18);
-    --radius-xl: 24px;
-    --transition-fast: 0.23s ease-out;
+  --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.18);
+  --radius-xl: 24px;
+  --transition-fast: 0.23s ease-out;
 }
 
 *,
 *::before,
 *::after {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
-html, body {
-    margin: 0;
-    padding: 0;
+html,
+body {
+  margin: 0;
+  padding: 0;
 }
 
 body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    color: var(--color-text);
-    background-color: #ffffff;
-    line-height: 1.6;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: var(--color-text);
+  background-color: #ffffff;
+  line-height: 1.6;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+/* 加入淡出-換頁-淡入的效果 */
+body {
+  opacity: 1;
+  transition: opacity .22s ease;
+}
+
+body.page-leave {
+  opacity: 0;
+}
+
+/* 如果瀏覽器不支援 scrollbar-gutter，就用這個備援 */
+@supports not (scrollbar-gutter: stable) {
+  html { overflow-y: scroll; }
 }
 
 /* 共用容器 */
 .container {
-    width: 100%;
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
 }
 
 /* 導覽列 */
 .site-header {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 50;
-    background: linear-gradient(to bottom, rgba(15,32,24,0.98), rgba(15,32,24,0.85), transparent);
-    color: var(--color-text-light);
-    backdrop-filter: blur(10px);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 50;
+  background: linear-gradient(
+    to bottom,
+    rgba(15, 32, 24, 0.98),
+    rgba(15, 32, 24, 0.85),
+    transparent
+  );
+  color: var(--color-text-light);
+  backdrop-filter: blur(10px);
 }
 
 .nav-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
 }
 
+/* logo的美編部分 */
 .logo {
-    text-decoration: none;
-    color: var(--color-text-light);
-    display: flex;
-    flex-direction: column;
-    line-height: 1.1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--color-text-light);
+}
+
+/* logo圖示的尺寸控制 */
+.logo-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+/* logo處的品牌文字 */
+.logo-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
 }
 
 .logo-main {
-    font-size: 1.2rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
 }
 
 .logo-sub {
-    font-size: 0.75rem;
-    opacity: 0.8;
+  font-size: 0.75rem;
+  opacity: 0.8;
 }
 
 /* 桌機版導覽 */
 .main-nav {
-    display: flex;
-    gap: 1.5rem;
-    align-items: center;
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
 }
 
 .main-nav a {
-    color: var(--color-text-light);
-    text-decoration: none;
-    font-size: 0.9rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    position: relative;
+  color: var(--color-text-light);
+  text-decoration: none;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  position: relative;
 }
 
 .main-nav a::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -0.35rem;
-    width: 0;
-    height: 2px;
-    background-color: var(--color-accent);
-    transition: width var(--transition-fast);
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -0.35rem;
+  width: 0;
+  height: 2px;
+  background-color: var(--color-accent);
+  transition: width var(--transition-fast);
 }
 
 .main-nav a:hover::after {
-    width: 100%;
+  width: 100%;
 }
 
 /* 手機版漢堡按鈕 */
 .nav-toggle {
-    display: none;
-    background: none;
-    border: none;
-    cursor: pointer;
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 .nav-toggle-line {
-    display: block;
-    width: 22px;
-    height: 2px;
-    background-color: var(--color-text-light);
-    margin: 4px 0;
-    transition: transform var(--transition-fast), opacity var(--transition-fast);
+  display: block;
+  width: 22px;
+  height: 2px;
+  background-color: var(--color-text-light);
+  margin: 4px 0;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
 }
 
 /* ===========================
    首頁頂部廣告輪播區
 =========================== */
 .ad-slider {
-    padding-top: 64px; /* 避開固定 header */
-    background: #0f2018;
-    color: var(--color-text-light);
+  padding-top: 64px;
+  /* 避開固定 header */
+  background: #0f2018;
+  color: var(--color-text-light);
 }
 
 .ad-slider-inner {
-    position: relative;
-    display: flex;
-    align-items: stretch;
-    gap: 1rem;
-    padding: 1.4rem 1.5rem 1.8rem;
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 1rem;
+  padding: 1.4rem 1.5rem 1.8rem;
 }
 
 .ad-slides {
-    flex: 1;
-    position: relative;
-    min-height: 400px;
+  flex: 1;
+  position: relative;
+  min-height: 400px;
 }
 
 /* 單一廣告卡片 */
 .ad-slide {
-    position: absolute;
-    inset: 0;
-    border-radius: 18px;
-    padding: 2rem 2.2rem;
-    background: radial-gradient(circle at top left, rgba(216,161,95,0.22), transparent 60%),
-                linear-gradient(135deg, #1a3126, #244337);
-    box-shadow: var(--shadow-soft);
-    opacity: 0;
-    transform: translateX(10px);
-    pointer-events: none;
-    transition: opacity 0.35s ease-out, transform 0.35s ease-out;
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  padding: 2rem 2.2rem;
+  background: radial-gradient(
+      circle at top left,
+      rgba(216, 161, 95, 0.22),
+      transparent 60%
+    ),
+    linear-gradient(135deg, #1a3126, #244337);
+  box-shadow: var(--shadow-soft);
+  opacity: 0;
+  transform: translateX(10px);
+  pointer-events: none;
+  transition: opacity 0.35s ease-out, transform 0.35s ease-out;
 }
 
 /* 顯示中的 slide */
 .ad-slide.active {
-    opacity: 1;
-    transform: translateX(0);
-    pointer-events: auto;
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
 }
 
 .ad-tag {
-    display: inline-flex;
-    padding: 0.15rem 0.6rem;
-    border-radius: 999px;
-    background-color: rgba(0,0,0,0.25);
-    font-size: 0.7rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    margin-bottom: 0.45rem;
+  display: inline-flex;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background-color: rgba(0, 0, 0, 0.25);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 0.45rem;
 }
 
 .ad-title {
-    margin: 0 0 0.4rem;
-    font-size: 1.4rem;
+  margin: 0 0 0.4rem;
+  font-size: 1.4rem;
 }
 
 .ad-text {
-    margin: 0;
-    font-size: 0.9rem;
-    opacity: 0.9;
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
 }
 
 /* 左右箭頭（可給 ad-prev / ad-next 共用） */
 .ad-arrow,
 .ad-prev,
 .ad-next {
-    align-self: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 999px;
-    border: 1px solid rgba(253,252,248,0.4);
-    background: transparent;
-    color: var(--color-text-light);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 1.4rem;
-    padding: 0;
-    transition: background-color var(--transition-fast),
-                transform var(--transition-fast),
-                border-color var(--transition-fast),
-                opacity var(--transition-fast);
+  align-self: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(253, 252, 248, 0.4);
+  background: transparent;
+  color: var(--color-text-light);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.4rem;
+  padding: 0;
+  transition: background-color var(--transition-fast),
+    transform var(--transition-fast), border-color var(--transition-fast),
+    opacity var(--transition-fast);
 }
 
 .ad-arrow:hover,
 .ad-prev:hover,
 .ad-next:hover {
-    background-color: rgba(253,252,248,0.08);
-    transform: translateY(-1px);
+  background-color: rgba(253, 252, 248, 0.08);
+  transform: translateY(-1px);
 }
 
 .ad-arrow:disabled,
 .ad-prev:disabled,
 .ad-next:disabled {
-    opacity: 0.4;
-    cursor: default;
-    transform: none;
+  opacity: 0.4;
+  cursor: default;
+  transform: none;
 }
 
 /* Hero 主視覺（若首頁有用） */
 .hero {
-    position: relative;
-    min-height: 80vh;
-    background-image:
-        linear-gradient(135deg, rgba(7,15,10,0.92), rgba(20,68,51,0.85)),
-        radial-gradient(circle at top left, rgba(216,161,95,0.4), transparent 60%);
-    background-size: cover;
-    background-position: center;
-    color: var(--color-text-light);
-    display: flex;
-    align-items: center;
-    padding: 3rem 0 3rem;
+  position: relative;
+  min-height: 80vh;
+  background-image: linear-gradient(
+      135deg,
+      rgba(7, 15, 10, 0.92),
+      rgba(20, 68, 51, 0.85)
+    ),
+    radial-gradient(
+      circle at top left,
+      rgba(216, 161, 95, 0.4),
+      transparent 60%
+    );
+  background-size: cover;
+  background-position: center;
+  color: var(--color-text-light);
+  display: flex;
+  align-items: center;
+  padding: 3rem 0 3rem;
 }
 
 .hero-overlay {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at bottom, rgba(0,0,0,0.25), transparent 60%);
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at bottom,
+    rgba(0, 0, 0, 0.25),
+    transparent 60%
+  );
 }
 
 .hero-content {
-    position: relative;
-    padding: 1.5rem 1.5rem 3rem;
+  position: relative;
+  padding: 1.5rem 1.5rem 3rem;
 }
 
 .hero-tagline {
-    font-size: 0.9rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    opacity: 0.8;
-    margin-bottom: 1rem;
+  font-size: 0.9rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  margin-bottom: 1rem;
 }
 
 .hero-title {
-    font-size: clamp(2.2rem, 4vw, 3rem);
-    max-width: 16em;
-    margin: 0 0 1rem;
+  font-size: clamp(2.2rem, 4vw, 3rem);
+  max-width: 16em;
+  margin: 0 0 1rem;
 }
 
 .hero-text {
-    max-width: 30em;
-    opacity: 0.85;
-    margin-bottom: 1.5rem;
+  max-width: 30em;
+  opacity: 0.85;
+  margin-bottom: 1.5rem;
 }
 
 .hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 /* 按鈕樣式 */
 .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.7rem 1.4rem;
-    border-radius: 999px;
-    border: 1px solid transparent;
-    font-size: 0.9rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background-color var(--transition-fast),
-                color var(--transition-fast),
-                transform var(--transition-fast),
-                box-shadow var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1.4rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color var(--transition-fast),
+    color var(--transition-fast), transform var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .primary-btn {
-    background-color: var(--color-accent);
-    color: #2c1a07;
-    box-shadow: var(--shadow-soft);
+  background-color: var(--color-accent);
+  color: #2c1a07;
+  box-shadow: var(--shadow-soft);
 }
 
 .primary-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 22px 45px rgba(0,0,0,0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 22px 45px rgba(0, 0, 0, 0.25);
 }
 
 .ghost-btn,
 .secondary-btn {
-    background-color: transparent;
-    color: var(--color-text-light);
-    border-color: rgba(253,252,248,0.6);
+  background-color: transparent;
+  color: var(--color-text-light);
+  border-color: rgba(253, 252, 248, 0.6);
 }
 
 .ghost-btn:hover,
 .secondary-btn:hover {
-    background-color: rgba(253,252,248,0.1);
+  background-color: rgba(253, 252, 248, 0.1);
 }
 
 /* 區塊共用樣式 */
 .section {
-    padding: 5rem 0;
+  padding: 5rem 0;
 }
 
 .section-alt {
-    background-color: var(--color-bg-alt);
+  background-color: var(--color-bg-alt);
 }
 
 .section-header {
-    text-align: center;
-    margin-bottom: 3rem;
+  text-align: center;
+  margin-bottom: 3rem;
 }
 
 .section-tag {
-    font-size: 0.75rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--color-primary);
-    margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
 }
 
 .section-title {
-    font-size: 1.7rem;
-    margin: 0 0 0.75rem;
-    color: var(--color-primary);
+  font-size: 1.7rem;
+  margin: 0 0 0.75rem;
+  color: var(--color-primary);
 }
 
 .section-subtitle {
-    max-width: 34em;
-    margin: 0 auto;
-    color: #555;
+  max-width: 34em;
+  margin: 0 auto;
+  color: #555;
 }
 
 /* 季節限定區塊 */
 .limited-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
-    gap: 2.5rem;
-    align-items: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+  gap: 2.5rem;
+  align-items: center;
 }
 
 .limited-image-card,
 .limited-info-card {
-    border-radius: var(--radius-xl);
-    overflow: hidden;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
 }
 
 .limited-image-card {
-    background: radial-gradient(circle at top left, rgba(216,161,95,0.18), transparent 60%),
-                linear-gradient(135deg, #16251d, #234839);
-    padding: 2rem;
-    color: var(--color-text-light);
-    box-shadow: var(--shadow-soft);
+  background: radial-gradient(
+      circle at top left,
+      rgba(216, 161, 95, 0.18),
+      transparent 60%
+    ),
+    linear-gradient(135deg, #16251d, #234839);
+  padding: 2rem;
+  color: var(--color-text-light);
+  box-shadow: var(--shadow-soft);
 }
 
 .limited-image-placeholder {
-    border-radius: 20px;
-    border: 1px solid rgba(253,252,248,0.32);
-    min-height: 260px;
-    display: flex;
-    align-items: flex-end;
-    padding: 1.5rem;
-    font-size: 1.3rem;
-    font-weight: 600;
-    background: radial-gradient(circle at 20% 0%, rgba(253,252,248,0.1), transparent 55%);
+  border-radius: 20px;
+  border: 1px solid rgba(253, 252, 248, 0.32);
+  min-height: 260px;
+  display: flex;
+  align-items: flex-end;
+  padding: 1.5rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  background: radial-gradient(
+    circle at 20% 0%,
+    rgba(253, 252, 248, 0.1),
+    transparent 55%
+  );
 }
 
 .limited-info-card {
-    background: #ffffff;
-    padding: 2rem;
-    box-shadow: var(--shadow-soft);
+  background: #ffffff;
+  padding: 2rem;
+  box-shadow: var(--shadow-soft);
 }
 
 .limited-info-card h3 {
-    margin-top: 0;
-    margin-bottom: 0.75rem;
-    color: var(--color-primary);
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: var(--color-primary);
 }
 
 .limited-info-card p {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    color: #444;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #444;
 }
 
 .limited-list {
-    padding-left: 1.2rem;
-    margin: 0 0 1.2rem;
+  padding-left: 1.2rem;
+  margin: 0 0 1.2rem;
 }
 
 .limited-note {
-    font-size: 0.85rem;
-    color: #666;
-    margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.75rem;
 }
 
 /* 卡片三欄 */
 .cards-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.8rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.8rem;
 }
 
 .card {
-    background-color: #ffffff;
-    border-radius: 18px;
-    padding: 1.6rem 1.7rem;
-    box-shadow: 0 14px 30px rgba(0,0,0,0.06);
+  background-color: #ffffff;
+  border-radius: 18px;
+  padding: 1.6rem 1.7rem;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.06);
 }
 
 .card h3 {
-    margin-top: 0;
-    margin-bottom: 0.7rem;
-    color: var(--color-primary);
+  margin-top: 0;
+  margin-bottom: 0.7rem;
+  color: var(--color-primary);
 }
 
 /* 品牌故事：左右交錯版面 */
 .story-block {
-    display: flex;
-    align-items: center;
-    gap: 2.5rem;
-    margin-bottom: 3rem;
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  margin-bottom: 3rem;
 }
 
 .story-image,
 .story-text {
-    flex: 1;
+  flex: 1;
 }
 
 /* 圖片外框 */
 .story-image-placeholder {
-    width: 100%;
-    border-radius: 20px;
-    min-height: 220px;
-    background: radial-gradient(circle at top left, rgba(216,161,95,0.25), transparent 60%),
-                linear-gradient(135deg, #16251d, #234839);
-    box-shadow: 0 18px 40px rgba(0,0,0,0.18);
-    display: flex;
-    align-items: flex-end;
-    padding: 1.3rem 1.4rem;
-    color: var(--color-text-light);
-    font-size: 1.1rem;
-    font-weight: 600;
+  width: 100%;
+  border-radius: 20px;
+  min-height: 220px;
+  background: radial-gradient(
+      circle at top left,
+      rgba(216, 161, 95, 0.25),
+      transparent 60%
+    ),
+    linear-gradient(135deg, #16251d, #234839);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: flex-end;
+  padding: 1.3rem 1.4rem;
+  color: var(--color-text-light);
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
 /* 第二區塊：左右對調 */
 .story-block-reverse {
-    flex-direction: row-reverse;
+  flex-direction: row-reverse;
 }
 
 .story-text h3 {
-    margin-top: 0;
-    margin-bottom: 0.75rem;
-    color: var(--color-primary);
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: var(--color-primary);
 }
 
 .story-text p {
-    margin-top: 0;
-    margin-bottom: 0.8rem;
-    color: #444;
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+  color: #444;
 }
 
 /* 職人區塊 */
 .craftsmen-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-    gap: 2rem;
-    align-items: start;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
 }
 
 .craftsmen-text p {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    color: #444;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #444;
 }
 
 .craftsmen-gallery {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.9rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
 }
 
 .gallery-item {
-    padding: 0.85rem 1rem;
-    border-radius: 999px;
-    border: 1px solid rgba(20,68,51,0.15);
-    background: #ffffff;
-    font-size: 0.9rem;
+  padding: 0.85rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(20, 68, 51, 0.15);
+  background: #ffffff;
+  font-size: 0.9rem;
 }
 
 /* ===========================
    飲品菜單頁
 =========================== */
 .menu-page {
-    padding-top: 6rem;
+  padding-top: 6rem;
 }
 
 /* 小標題 */
 .menu-section-title {
-    font-size: 1.3rem;
-    margin: 2rem 0 1rem;
-    color: var(--color-primary);
+  font-size: 1.3rem;
+  margin: 2rem 0 1rem;
+  color: var(--color-primary);
 }
 
 /* --- 熱銷榜 --- */
 
 .menu-ranking {
-    margin-top: 1rem;
+  margin-top: 1rem;
 }
 
 .menu-ranking-grid {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    gap: 1.3rem;
-    flex-wrap: wrap;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 1.3rem;
+  flex-wrap: wrap;
 }
 
 /* 共用卡片樣式 */
 .rank-card {
-    position: relative;
-    width: 210px;
-    border-radius: 20px;
-    background-color: #ffffff;
-    box-shadow: 0 14px 30px rgba(0,0,0,0.08);
-    padding: 1rem 1rem 1.1rem;
-    cursor: pointer;
-    transform: translateY(8px) scale(0.93);
-    transition:
-        transform 0.28s ease-out,
-        box-shadow 0.28s ease-out,
-        width 0.28s ease-out;
+  position: relative;
+  width: 210px;
+  border-radius: 20px;
+  background-color: #ffffff;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
+  padding: 1rem 1rem 1.1rem;
+  cursor: pointer;
+  transform: translateY(8px) scale(0.93);
+  transition: transform 0.28s ease-out, box-shadow 0.28s ease-out,
+    width 0.28s ease-out;
 }
 
 .rank-card:hover {
-    transform: translateY(2px) scale(0.98);
-    box-shadow: 0 18px 40px rgba(0,0,0,0.12);
+  transform: translateY(2px) scale(0.98);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
 }
 
 /* 中間那張（被選取 / spotlight） */
 .rank-featured {
-    width: 240px;
-    transform: translateY(0) scale(1.06);
-    box-shadow: 0 20px 46px rgba(0,0,0,0.16);
+  width: 240px;
+  transform: translateY(0) scale(1.06);
+  box-shadow: 0 20px 46px rgba(0, 0, 0, 0.16);
 }
 
 /* 每一張的假圖片 */
 .rank-image-placeholder {
-    border-radius: 16px;
-    min-height: 140px;
-    background: radial-gradient(circle at top left, rgba(216,161,95,0.25), transparent 60%),
-                linear-gradient(135deg, #16251d, #234839);
-    color: var(--color-text-light);
-    display: flex;
-    align-items: flex-end;
-    padding: 0.9rem 1rem;
-    font-weight: 600;
-    font-size: 0.95rem;
-    margin-bottom: 0.6rem;
+  border-radius: 16px;
+  min-height: 140px;
+  background: radial-gradient(
+      circle at top left,
+      rgba(216, 161, 95, 0.25),
+      transparent 60%
+    ),
+    linear-gradient(135deg, #16251d, #234839);
+  color: var(--color-text-light);
+  display: flex;
+  align-items: flex-end;
+  padding: 0.9rem 1rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.6rem;
 }
 
 .rank-tag {
-    display: inline-flex;
-    padding: 0.15rem 0.6rem;
-    border-radius: 999px;
-    background-color: rgba(0,0,0,0.06);
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 0.5rem;
-    color: #666;
+  display: inline-flex;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background-color: rgba(0, 0, 0, 0.06);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  color: #666;
 }
 
 .rank-name {
-    margin: 0 0 0.4rem;
-    color: var(--color-primary);
+  margin: 0 0 0.4rem;
+  color: var(--color-primary);
 }
 
 /* 預設：收起 + 透明 */
 .rank-desc {
-    margin: 0;
-    font-size: 0.85rem;
-    color: #555;
-    opacity: 0;
-    max-height: 0;
-    overflow: hidden;
-    transition:
-        opacity 0.25s ease-out,
-        max-height 0.25s ease-out;
+  margin: 0;
+  font-size: 0.85rem;
+  color: #555;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 0.25s ease-out, max-height 0.25s ease-out;
 }
 
 /* 只有中間那張才展開介紹 */
 .rank-featured .rank-desc {
-    opacity: 1;
-    max-height: 120px;
+  opacity: 1;
+  max-height: 120px;
 }
 
 /* 菜單分隔線 */
 .menu-divider {
-    width: 100%;
-    height: 1px;
-    background-color: rgba(var(--color-primary-rgb), 0.28);
-    margin: 2.5rem 0;
+  width: 100%;
+  height: 1px;
+  background-color: rgba(var(--color-primary-rgb), 0.28);
+  margin: 2.5rem 0;
 }
 
 /* --- 全部飲品介紹 --- */
 
 .menu-all {
-    margin-top: 2.5rem;
+  margin-top: 2.5rem;
 }
 
 .menu-drink-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.7rem;
 }
 
 .menu-drink-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 1.4rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.4rem;
 }
 
 .menu-drink-image {
-    flex: 0 0 160px;
+  flex: 0 0 160px;
+}
+
+.menu-drink-image-img {
+    width: 100%;
+    height: 140px;
+    object-fit: contain; 
+    border-radius: 18px;
+    display: block;
 }
 
 .menu-drink-image-placeholder {
-    width: 100%;
-    border-radius: 18px;
-    min-height: 140px;
-    background: radial-gradient(circle at top left, rgba(216,161,95,0.25), transparent 60%),
-                linear-gradient(135deg, #16251d, #234839);
-    color: var(--color-text-light);
-    display: flex;
-    align-items: flex-end;
-    padding: 0.9rem 1rem;
-    font-weight: 600;
-    font-size: 0.9rem;
+  width: 100%;
+  border-radius: 18px;
+  min-height: 140px;
+  background: radial-gradient(
+      circle at top left,
+      rgba(216, 161, 95, 0.25),
+      transparent 60%
+    ),
+    linear-gradient(135deg, #16251d, #234839);
+  color: var(--color-text-light);
+  display: flex;
+  align-items: flex-end;
+  padding: 0.9rem 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
 .menu-drink-text {
-    flex: 1;
+  flex: 1;
 }
 
 .menu-drink-text h3 {
-    margin: 0 0 0.4rem;
-    color: var(--color-primary);
+  margin: 0 0 0.4rem;
+  color: var(--color-primary);
 }
 
 .menu-drink-text p {
-    margin: 0 0 0.4rem;
-    color: #444;
+  margin: 0 0 0.4rem;
+  color: #444;
 }
 
 .menu-drink-meta {
-    font-size: 0.85rem;
-    color: #777;
+  font-size: 0.85rem;
+  color: #777;
 }
 
 .menu-order-cta {
-    margin-top: 2.2rem;
-    text-align: center;
+  margin-top: 2.2rem;
+  text-align: center;
 }
 
 /* 菜單頁 RWD */
 @media (max-width: 900px) {
-    .menu-ranking-grid {
-        align-items: stretch;
-    }
+  .menu-ranking-grid {
+    align-items: stretch;
+  }
 
-    .rank-card,
-    .rank-featured {
-        width: 100%;
-        max-width: 360px;
-        transform: translateY(0) scale(1);
-    }
+  .rank-card,
+  .rank-featured {
+    width: 100%;
+    max-width: 360px;
+    transform: translateY(0) scale(1);
+  }
 
-    .menu-drink-row {
-        flex-direction: column;
-    }
+  .menu-drink-row {
+    flex-direction: column;
+  }
 
-    .menu-drink-image {
-        flex: 0 0 auto;
-        width: 100%;
-        max-width: 360px;
-    }
+  .menu-drink-image {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 360px;
+  }
 }
 
 /* 表單（共用） */
 .contact-form {
-    background-color: #ffffff;
-    padding: 2rem 1.7rem;
-    border-radius: 18px;
-    box-shadow: 0 14px 30px rgba(0,0,0,0.06);
-    display: grid;
-    gap: 1rem;
+  background-color: #ffffff;
+  padding: 2rem 1.7rem;
+  border-radius: 18px;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.06);
+  display: grid;
+  gap: 1rem;
 }
 
 .contact-form label {
-    display: block;
-    font-size: 0.9rem;
-    color: #333;
+  display: block;
+  font-size: 0.9rem;
+  color: #333;
 }
 
 .contact-form input,
 .contact-form textarea {
-    width: 100%;
-    margin-top: 0.25rem;
-    border-radius: 12px;
-    border: 1px solid #ddd;
-    padding: 0.6rem 0.7rem;
-    font-family: inherit;
-    font-size: 0.9rem;
-    outline: none;
-    transition: border-color var(--transition-fast),
-                box-shadow var(--transition-fast);
+  width: 100%;
+  margin-top: 0.25rem;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  padding: 0.6rem 0.7rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .contact-form input:focus,
 .contact-form textarea:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px rgba(20,68,51,0.16);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(20, 68, 51, 0.16);
 }
 
 .form-note {
-    font-size: 0.8rem;
-    color: #777;
+  font-size: 0.8rem;
+  color: #777;
 }
 
 /* 右下角懸浮按鈕 – 共用設定 */
 .fab {
-    position: fixed;
-    right: 1.25rem;
-    border-radius: 999px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    z-index: 60;
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+  position: fixed;
+  right: 1.25rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  z-index: 60;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
 }
 
 /* 回到頂部按鈕（在上面） */
 .back-to-top {
-    bottom: 6.4rem;
-    width: 40px;
-    height: 40px;
-    border: none;
-    background-color: var(--color-primary);
-    color: var(--color-text-light);
-    cursor: pointer;
-    opacity: 0;
-    pointer-events: none;
-    transition:
-        transform var(--transition-fast),
-        opacity var(--transition-fast);
+  bottom: 6.4rem;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background-color: var(--color-primary);
+  color: var(--color-text-light);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
 }
 
 .back-to-top.show {
-    opacity: 1;
-    pointer-events: auto;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .back-to-top:hover {
-    transform: translateY(-2px);
+  transform: translateY(-2px);
 }
 
 /* 懸浮購物車（在下面） */
 .cart-floating {
-    bottom: 1.6rem;
-    width: 52px;
-    height: 52px;
-    background-color: var(--color-primary);
-    color: var(--color-text-light);
-    font-size: 1.4rem;
+  bottom: 1.6rem;
+  width: 52px;
+  height: 52px;
+  background-color: var(--color-primary);
+  color: var(--color-text-light);
+  font-size: 1.4rem;
 }
 
 /* 掛在購物車右上角的數字徽章 */
 .cart-floating .cart-count-badge {
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    min-width: 20px;
-    height: 20px;
-    padding: 0 6px;
-    border-radius: 999px;
-    background-color: var(--color-accent);
-    color: #2c1a07;
-    font-size: 0.75rem;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background-color: var(--color-accent);
+  color: #2c1a07;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ===========================
    訂購頁 / 商品卡片
 =========================== */
 .order-page {
-    padding-top: 6rem;
+  padding-top: 6rem;
 }
 
 .page-title {
-    font-size: 1.8rem;
-    margin-bottom: 0.6rem;
-    color: var(--color-primary);
+  font-size: 1.8rem;
+  margin-bottom: 0.6rem;
+  color: var(--color-primary);
 }
 
 .page-subtitle {
-    margin-top: 0;
-    margin-bottom: 2rem;
-    color: #555;
+  margin-top: 0;
+  margin-bottom: 2rem;
+  color: #555;
 }
 
 .drink-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.8rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.8rem;
 }
 
 .drink-card {
-    background-color: #ffffff;
-    border-radius: 18px;
-    padding: 1.6rem 1.7rem;
-    box-shadow: 0 14px 30px rgba(0,0,0,0.06);
-    display: flex;
-    flex-direction: column;
-    gap: 0.9rem;
+  background-color: #ffffff;
+  border-radius: 18px;
+  padding: 1.6rem 1.7rem;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
 }
 
 .drink-name {
-    margin: 0;
-    font-size: 1.2rem;
-    color: var(--color-primary);
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--color-primary);
 }
 
 .drink-desc {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #555;
+  margin: 0;
+  font-size: 0.9rem;
+  color: #555;
 }
 
 .drink-price {
-    margin: 0.2rem 0 0.6rem;
-    font-weight: 600;
-    color: #333;
+  margin: 0.2rem 0 0.6rem;
+  font-weight: 600;
+  color: #333;
 }
 
 /* 選項區塊 */
 .drink-options {
-    display: flex;
-    flex-direction: column;
-    gap: 0.9rem;
-    margin-bottom: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin-bottom: 0.9rem;
 }
 
 .option-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
 .option-label {
-    font-size: 0.8rem;
-    color: #555;
+  font-size: 0.8rem;
+  color: #555;
 }
 
 /* 杯型下拉 */
 .option-group select {
-    border-radius: 12px;
-    border: 1px solid #ddd;
-    padding: 0.4rem 0.6rem;
-    font-size: 0.9rem;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.9rem;
 }
 
 /* 甜度 / 冰塊 滑桿 */
 .option-slider {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
 .option-slider input[type="range"] {
-    appearance: none;
-    width: 100%;
-    height: 6px;
-    border-radius: 999px;
-    background: rgba(20, 68, 51, 0.16);
-    outline: none;
-    margin: 0;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(20, 68, 51, 0.16);
+  outline: none;
+  margin: 0;
 }
 
 /* 滑桿軌道（Webkit） */
 .option-slider input[type="range"]::-webkit-slider-thumb {
-    appearance: none;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(20, 68, 51, 0.2);
-    cursor: pointer;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(20, 68, 51, 0.2);
+  cursor: pointer;
 }
 
 /* Firefox */
 .option-slider input[type="range"]::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(20, 68, 51, 0.2);
-    border: none;
-    cursor: pointer;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(20, 68, 51, 0.2);
+  border: none;
+  cursor: pointer;
 }
 
 .option-slider input[type="range"]::-moz-range-track {
-    height: 6px;
-    border-radius: 999px;
-    background: rgba(20, 68, 51, 0.16);
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(20, 68, 51, 0.16);
 }
 
 .slider-labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.7rem;
-    color: #777;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: #777;
 }
 
 /* 加料區 */
 .option-toppings .toppings-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem 1rem;
-    font-size: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  font-size: 0.85rem;
 }
 
 .option-toppings label {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
 }
 
 .option-toppings input[type="checkbox"] {
-    width: 14px;
-    height: 14px;
-    accent-color: var(--color-primary);
+  width: 14px;
+  height: 14px;
+  accent-color: var(--color-primary);
 }
 
 /* ===========================
    購物車頁
 =========================== */
 .cart-page {
-    padding-top: 6rem;
+  padding-top: 6rem;
 }
 
 .cart-empty-message {
-    background-color: #fff;
-    border-radius: 16px;
-    padding: 1.2rem 1.3rem;
-    box-shadow: 0 10px 24px rgba(0,0,0,0.06);
-    font-size: 0.95rem;
-    margin-bottom: 1.5rem;
-    display: none;
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 1.2rem 1.3rem;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  display: none;
 }
 
 .cart-empty-message a {
-    color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .cart-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .cart-item {
-    background-color: #ffffff;
-    border-radius: 16px;
-    padding: 1rem 1.2rem;
-    box-shadow: 0 10px 24px rgba(0,0,0,0.06);
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    align-items: center;
-    flex-wrap: wrap;
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 1rem 1.2rem;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .cart-item-main {
-    flex: 1;
-    min-width: 180px;
+  flex: 1;
+  min-width: 180px;
 }
 
 .cart-item-name {
-    font-weight: 600;
-    color: var(--color-primary);
-    margin-bottom: 0.3rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: 0.3rem;
 }
 
 .cart-item-options {
-    font-size: 0.85rem;
-    color: #555;
+  font-size: 0.85rem;
+  color: #555;
 }
 
 .cart-item-side {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
 }
 
 .cart-item-price {
-    font-weight: 600;
+  font-weight: 600;
 }
 
 .cart-item-qty {
-    display: inline-flex;
-    align-items: center;
-    border-radius: 999px;
-    border: 1px solid #ddd;
-    overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  overflow: hidden;
 }
 
 .cart-item-qty button {
-    border: none;
-    background: #f5f5f5;
-    padding: 0.2rem 0.5rem;
-    cursor: pointer;
-    font-size: 0.9rem;
+  border: none;
+  background: #f5f5f5;
+  padding: 0.2rem 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
 }
 
 .cart-item-qty-value {
-    padding: 0 0.6rem;
-    font-size: 0.9rem;
+  padding: 0 0.6rem;
+  font-size: 0.9rem;
 }
 
 .cart-item-remove {
-    border: none;
-    background: transparent;
-    color: #c43b3b;
-    cursor: pointer;
-    font-size: 0.85rem;
+  border: none;
+  background: transparent;
+  color: #c43b3b;
+  cursor: pointer;
+  font-size: 0.85rem;
 }
 
 .cart-summary {
-    max-width: 400px;
-    margin-left: auto;
-    background-color: #ffffff;
-    border-radius: 16px;
-    padding: 1.2rem 1.3rem;
-    box-shadow: 0 10px 24px rgba(0,0,0,0.06);
-    display: none;
+  max-width: 400px;
+  margin-left: auto;
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 1.2rem 1.3rem;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+  display: none;
 }
 
 .cart-summary-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.6rem;
-    font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+  font-weight: 600;
 }
 
 .cart-summary-note {
-    font-size: 0.8rem;
-    color: #777;
-    margin: 0.4rem 0 0.9rem;
+  font-size: 0.8rem;
+  color: #777;
+  margin: 0.4rem 0 0.9rem;
 }
 
 /* ===========================
    結帳頁
 =========================== */
 .checkout-page {
-    padding-top: 6rem;
+  padding-top: 6rem;
 }
 
 .checkout-content {
-    display: none;
-    gap: 2rem;
-    margin-top: 1.5rem;
+  display: none;
+  gap: 2rem;
+  margin-top: 1.5rem;
 }
 
 .checkout-summary-section,
 .checkout-form-section {
-    flex: 1;
+  flex: 1;
 }
 
 .checkout-section-title {
-    margin-top: 0;
-    margin-bottom: 0.7rem;
-    color: var(--color-primary);
+  margin-top: 0;
+  margin-bottom: 0.7rem;
+  color: var(--color-primary);
 }
 
 .checkout-summary-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    margin-bottom: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
 }
 
 .checkout-summary-item {
-    display: flex;
-    justify-content: space-between;
-    gap: 0.8rem;
-    font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  font-size: 0.9rem;
 }
 
 .checkout-summary-item-main {
-    flex: 1;
+  flex: 1;
 }
 
 .checkout-summary-item-name {
-    font-weight: 600;
-    margin-bottom: 0.2rem;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
 }
 
 .checkout-summary-item-options {
-    font-size: 0.8rem;
-    color: #555;
+  font-size: 0.8rem;
+  color: #555;
 }
 
 .checkout-summary-item-total {
-    white-space: nowrap;
+  white-space: nowrap;
 }
 
 .checkout-summary-total {
-    display: flex;
-    justify-content: space-between;
-    font-weight: 600;
-    margin-top: 0.4rem;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  margin-top: 0.4rem;
 }
 
 .checkout-form {
-    background-color: #ffffff;
-    border-radius: 16px;
-    padding: 1.2rem 1.3rem;
-    box-shadow: 0 10px 24px rgba(0,0,0,0.06);
-    display: grid;
-    gap: 0.9rem;
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 1.2rem 1.3rem;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+  display: grid;
+  gap: 0.9rem;
 }
 
 .checkout-form label {
-    display: block;
-    font-size: 0.9rem;
-    color: #333;
+  display: block;
+  font-size: 0.9rem;
+  color: #333;
 }
 
 .checkout-form input,
 .checkout-form select,
 .checkout-form textarea {
-    width: 100%;
-    margin-top: 0.25rem;
-    border-radius: 12px;
-    border: 1px solid #ddd;
-    padding: 0.6rem 0.7rem;
-    font-family: inherit;
-    font-size: 0.9rem;
+  width: 100%;
+  margin-top: 0.25rem;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  padding: 0.6rem 0.7rem;
+  font-family: inherit;
+  font-size: 0.9rem;
 }
 
 /* 備註欄：高度放大一點 */
 .checkout-form textarea {
-    resize: vertical;
-    min-height: 140px;
+  resize: vertical;
+  min-height: 140px;
 }
 
 /* 結帳欄位間距優化 */
 .checkout-form-group {
-    margin-bottom: 1.4rem;
+  margin-bottom: 1.4rem;
 }
 
 .checkout-form-group input,
 .checkout-form-group textarea,
 .checkout-form-group select {
-    margin-bottom: 0.6rem;
+  margin-bottom: 0.6rem;
 }
 
 /* 付款方式：橫向三顆小圓角按鈕 */
 .payment-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-top: 0.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.4rem;
 }
 
 .payment-option {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    border-radius: 999px;
-    border: 1px solid #ddd;
-    padding: 0.45rem 0.9rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition:
-        background-color var(--transition-fast),
-        color var(--transition-fast),
-        border-color var(--transition-fast),
-        box-shadow var(--transition-fast);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color var(--transition-fast),
+    color var(--transition-fast), border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .payment-option:hover {
-    border-color: var(--color-primary-light);
+  border-color: var(--color-primary-light);
 }
 
 .payment-option input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .payment-option span {
-    pointer-events: none;
+  pointer-events: none;
 }
 
 /* 需要現代瀏覽器支援 :has */
 .payment-option:has(input[type="radio"]:checked) {
-    background-color: rgba(var(--color-primary-rgb), 0.08);
-    border-color: var(--color-primary);
-    color: var(--color-primary);
-    box-shadow: 0 0 0 1px rgba(var(--color-primary-rgb), 0.25);
+  background-color: rgba(var(--color-primary-rgb), 0.08);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  box-shadow: 0 0 0 1px rgba(var(--color-primary-rgb), 0.25);
 }
 
 #checkoutForm .btn {
-    margin-top: 1.6rem;
+  margin-top: 1.6rem;
 }
 
 /* ===========================
@@ -1256,63 +1332,63 @@ body {
 =========================== */
 
 .about-section {
-    background: #faf8f5;
+  background: #faf8f5;
 }
 
 .team-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
 }
 
 .team-card {
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 1.5rem;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .team-photo {
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    border-radius: 12px;
-    overflow: hidden;
-    background-size: cover;
-    background-position: center;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 12px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
 }
 
 .team-photo-placeholder {
-    background: linear-gradient(135deg, #f3e7ff, #fde7e7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
+  background: linear-gradient(135deg, #f3e7ff, #fde7e7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .team-photo-placeholder::before {
-    content: "成員照片預留";
-    color: rgba(0, 0, 0, 0.35);
-    font-size: 0.9rem;
+  content: "成員照片預留";
+  color: rgba(0, 0, 0, 0.35);
+  font-size: 0.9rem;
 }
 
 .team-name {
-    font-size: 1.1rem;
-    font-weight: 700;
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 
 .team-role {
-    font-size: 0.95rem;
-    color: #8a7f77;
+  font-size: 0.95rem;
+  color: #8a7f77;
 }
 
 .team-bio {
-    font-size: 0.95rem;
-    color: #4b433c;
-    line-height: 1.6;
+  font-size: 0.95rem;
+  color: #4b433c;
+  line-height: 1.6;
 }
 
 /* ===========================
@@ -1320,51 +1396,51 @@ body {
 =========================== */
 
 .franchise-page {
-    padding-top: 6rem;
-    padding-bottom: 5rem;
+  padding-top: 6rem;
+  padding-bottom: 5rem;
 }
 
 .franchise-form {
-    max-width: 600px;
-    margin: 2rem auto 0;
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 1.75rem 1.5rem;
-    box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+  max-width: 600px;
+  margin: 2rem auto 0;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 1.75rem 1.5rem;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
 }
 
 .franchise-form .form-row {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
 }
 
 .franchise-form label {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #443d37;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #443d37;
 }
 
 .franchise-form input,
 .franchise-form textarea {
-    border: 1px solid #ddd3c8;
-    border-radius: 10px;
-    padding: 0.6rem 0.8rem;
-    font-size: 0.95rem;
-    outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #ddd3c8;
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .franchise-form input:focus,
 .franchise-form textarea:focus {
-    border-color: #c98f52;
-    box-shadow: 0 0 0 2px rgba(201,143,82,0.2);
+  border-color: #c98f52;
+  box-shadow: 0 0 0 2px rgba(201, 143, 82, 0.2);
 }
 
 .franchise-form button {
-    margin-top: 0.5rem;
-    width: 100%;
+  margin-top: 0.5rem;
+  width: 100%;
 }
 
 /* ===========================
@@ -1372,185 +1448,185 @@ body {
 =========================== */
 
 .site-footer {
-    background-color: var(--color-bg);
-    color: rgba(252,250,244,0.9);
-    padding: 2.5rem 0 1.5rem;
-    margin-top: 3rem;
+  background-color: var(--color-bg);
+  color: rgba(252, 250, 244, 0.9);
+  padding: 2.5rem 0 1.5rem;
+  margin-top: 3rem;
 }
 
 .footer-content {
-    display: flex;
-    justify-content: space-between;
-    gap: 2rem;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
 }
 
 .footer-title {
-    font-size: 1.1rem;
-    margin-bottom: 0.8rem;
+  font-size: 1.1rem;
+  margin-bottom: 0.8rem;
 }
 
 .footer-info p {
-    font-size: 0.9rem;
-    line-height: 1.6;
-    color: #d9cbbd;
-    margin: 0.1rem 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #d9cbbd;
+  margin: 0.1rem 0;
 }
 
 .footer-links {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .footer-social-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.95rem;
-    color: rgba(252,250,244,0.9);
-    text-decoration: none;
-    opacity: 0.9;
-    transition: opacity 0.2s ease, transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: rgba(252, 250, 244, 0.9);
+  text-decoration: none;
+  opacity: 0.9;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .footer-social-link:hover {
-    opacity: 1;
-    transform: translateY(-1px);
+  opacity: 1;
+  transform: translateY(-1px);
 }
 
 /* IG 圖示（純 CSS） */
 .footer-ig-icon {
-    display: inline-block;
-    width: 24px;
-    height: 24px;
-    border-radius: 7px;
-    border: 2px solid currentColor;
-    position: relative;
-    box-sizing: border-box;
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  border: 2px solid currentColor;
+  position: relative;
+  box-sizing: border-box;
 }
 
 .footer-ig-icon::before {
-    content: "";
-    position: absolute;
-    inset: 5px;
-    border-radius: 50%;
-    border: 2px solid currentColor;
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
 }
 
 .footer-ig-icon::after {
-    content: "";
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: currentColor;
-    top: 4px;
-    right: 4px;
+  content: "";
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  top: 4px;
+  right: 4px;
 }
 
 .footer-bottom {
-    border-top: 1px solid rgba(255,255,255,0.08);
-    margin-top: 1.5rem;
-    padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 1.5rem;
+  padding-top: 1rem;
 }
 
 .footer-bottom p {
-    font-size: 0.85rem;
-    color: #b2a596;
-    margin: 0;
+  font-size: 0.85rem;
+  color: #b2a596;
+  margin: 0;
 }
 
 /* ========== RWD 手機 / 平板 ========== */
 
 @media (max-width: 900px) {
-    .main-nav {
-        position: absolute;
-        inset: 64px 1.5rem auto;
-        background-color: rgba(15,32,24,0.96);
-        border-radius: 18px;
-        padding: 0.8rem 1rem;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.8rem;
-        box-shadow: 0 18px 40px rgba(0,0,0,0.5);
-        max-height: 0;
-        overflow: hidden;
-        opacity: 0;
-        pointer-events: none;
-        transition: max-height 0.26s ease-out, opacity 0.22s ease-out;
-    }
+  .main-nav {
+    position: absolute;
+    inset: 64px 1.5rem auto;
+    background-color: rgba(15, 32, 24, 0.96);
+    border-radius: 18px;
+    padding: 0.8rem 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: max-height 0.26s ease-out, opacity 0.22s ease-out;
+  }
 
-    .main-nav.open {
-        max-height: 260px;
-        opacity: 1;
-        pointer-events: auto;
-    }
+  .main-nav.open {
+    max-height: 260px;
+    opacity: 1;
+    pointer-events: auto;
+  }
 
-    .nav-toggle {
-        display: block;
-    }
+  .nav-toggle {
+    display: block;
+  }
 
-    .ad-slider-inner {
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-    }
+  .ad-slider-inner {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
 
-    .limited-grid,
-    .craftsmen-grid {
-        grid-template-columns: 1fr;
-    }
+  .limited-grid,
+  .craftsmen-grid {
+    grid-template-columns: 1fr;
+  }
 
-    .cards-grid {
-        grid-template-columns: 1fr;
-    }
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
 
-    .hero-content {
-        padding-top: 2.2rem;
-    }
+  .hero-content {
+    padding-top: 2.2rem;
+  }
 
-    .drink-grid {
-        grid-template-columns: 1fr;
-    }
+  .drink-grid {
+    grid-template-columns: 1fr;
+  }
 
-    .cart-item {
-        align-items: flex-start;
-    }
+  .cart-item {
+    align-items: flex-start;
+  }
 
-    .cart-item-side {
-        width: 100%;
-        justify-content: flex-end;
-    }
+  .cart-item-side {
+    width: 100%;
+    justify-content: flex-end;
+  }
 
-    .checkout-content {
-        flex-direction: column;
-    }
+  .checkout-content {
+    flex-direction: column;
+  }
 
-    .team-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+  .team-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 
-    .footer-content {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+  .footer-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 @media (max-width: 600px) {
-    .section {
-        padding: 3.7rem 0;
-    }
+  .section {
+    padding: 3.7rem 0;
+  }
 
-    .limited-image-placeholder {
-        min-height: 210px;
-        font-size: 1.1rem;
-    }
+  .limited-image-placeholder {
+    min-height: 210px;
+    font-size: 1.1rem;
+  }
 
-    .team-grid {
-        grid-template-columns: 1fr;
-    }
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ===========================
@@ -1558,44 +1634,41 @@ body {
 =========================== */
 
 .menu-drink-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
 .menu-drink-header h3 {
-    margin: 0;
-    color: var(--color-primary);
+  margin: 0;
+  color: var(--color-primary);
 }
 
 .menu-add-btn {
-    flex-shrink: 0;
-    width: 32px;
-    height: 32px;
-    border-radius: 999px;
-    border: 1px solid #ddd;
-    background-color: #ffffff;
-    cursor: pointer;
-    font-size: 1.2rem;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition:
-        background-color var(--transition-fast),
-        color var(--transition-fast),
-        border-color var(--transition-fast),
-        transform var(--transition-fast),
-        box-shadow var(--transition-fast);
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  background-color: #ffffff;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-fast),
+    color var(--transition-fast), border-color var(--transition-fast),
+    transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .menu-add-btn:hover {
-    background-color: var(--color-primary);
-    color: var(--color-text-light);
-    border-color: var(--color-primary);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+  background-color: var(--color-primary);
+  color: var(--color-text-light);
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
 }
 
 /* ===========================
@@ -1604,50 +1677,50 @@ body {
 
 .order-modal-backdrop,
 .rating-modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.35);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 80;
-    padding: 1.25rem;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 80;
+  padding: 1.25rem;
 }
 
 .order-modal-backdrop.show,
 .rating-modal-backdrop.show {
-    display: flex;
+  display: flex;
 }
 
 .order-modal,
 .rating-modal {
-    width: 100%;
-    max-width: 480px;
+  width: 100%;
+  max-width: 480px;
 }
 
 /* 彈窗裡沿用 drink-card 的樣式，再稍微調整一下間距 */
 .modal-drink-card {
-    position: relative;
-    max-height: 90vh;
-    overflow-y: auto;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .order-modal-close,
 .rating-modal-close {
-    position: absolute;
-    top: 0.7rem;
-    right: 0.9rem;
-    border: none;
-    background: transparent;
-    font-size: 1.4rem;
-    cursor: pointer;
-    color: #999;
-    padding: 0;
+  position: absolute;
+  top: 0.7rem;
+  right: 0.9rem;
+  border: none;
+  background: transparent;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: #999;
+  padding: 0;
 }
 
 .order-modal-close:hover,
 .rating-modal-close:hover {
-    color: #555;
+  color: #555;
 }
 
 /* 彈窗打開時，背景模糊＋不可點擊 */
@@ -1655,99 +1728,99 @@ body.modal-open header,
 body.modal-open main,
 body.modal-open footer,
 body.modal-open .fab {
-    filter: blur(4px);
-    pointer-events: none;
-    user-select: none;
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
 }
 
 /* 讓彈窗本身仍可操作（訂購＋評分） */
 body.modal-open .order-modal-backdrop,
 body.modal-open .rating-modal-backdrop {
-    pointer-events: auto;
-    filter: none;
+  pointer-events: auto;
+  filter: none;
 }
 
 /* 彈窗裡的備註欄位稍微大一點 */
 .modal-drink-card .drink-note {
-    width: 100%;
-    min-height: 100px;
-    border-radius: 12px;
-    border: 1px solid #ddd;
-    padding: 0.6rem 0.7rem;
-    font-family: inherit;
-    font-size: 0.9rem;
-    resize: vertical;
+  width: 100%;
+  min-height: 100px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  padding: 0.6rem 0.7rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
 }
 
 /* 評分彈窗卡片 */
 .rating-card {
-    background-color: #ffffff;
-    border-radius: 18px;
-    padding: 1.6rem 1.7rem 1.4rem;
-    box-shadow: var(--shadow-soft);
-    position: relative;
-    max-height: 90vh;
-    overflow-y: auto;
+  background-color: #ffffff;
+  border-radius: 18px;
+  padding: 1.6rem 1.7rem 1.4rem;
+  box-shadow: var(--shadow-soft);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .rating-modal-title {
-    margin: 0 0 0.4rem;
-    font-size: 1.2rem;
-    color: var(--color-primary);
+  margin: 0 0 0.4rem;
+  font-size: 1.2rem;
+  color: var(--color-primary);
 }
 
 .rating-modal-sub {
-    margin: 0 0 0.8rem;
-    font-size: 0.9rem;
-    color: #555;
+  margin: 0 0 0.8rem;
+  font-size: 0.9rem;
+  color: #555;
 }
 
 .rating-modal-stars {
-    display: flex;
-    gap: 0.25rem;
-    font-size: 1.4rem;
-    margin-bottom: 0.6rem;
+  display: flex;
+  gap: 0.25rem;
+  font-size: 1.4rem;
+  margin-bottom: 0.6rem;
 }
 
 .rating-modal-comment {
-    width: 100%;
-    min-height: 110px;
-    border-radius: 12px;
-    border: 1px solid #ddd;
-    padding: 0.6rem 0.7rem;
-    font-family: inherit;
-    font-size: 0.9rem;
-    resize: vertical;
+  width: 100%;
+  min-height: 110px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  padding: 0.6rem 0.7rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
 }
 
 .rating-modal-actions {
-    display: flex;
-    gap: 0.6rem;
-    margin-top: 0.8rem;
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
 }
 
 .rating-modal-actions .btn {
-    flex: 1;
-    justify-content: center;
+  flex: 1;
+  justify-content: center;
 }
 
 .rating-modal-note {
-    margin-top: 0.6rem;
-    font-size: 0.8rem;
-    color: #777;
+  margin-top: 0.6rem;
+  font-size: 0.8rem;
+  color: #777;
 }
 
 /* 評分彈窗裡的按鈕樣式 */
 #ratingModalDelete {
-    background-color: #ffffff;
-    color: var(--color-primary);
-    border: 1px solid var(--color-primary);
-    box-shadow: none;
-    opacity: 1;
+  background-color: #ffffff;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  box-shadow: none;
+  opacity: 1;
 }
 
 #ratingModalDelete:hover {
-    background-color: #f5f5f5;
+  background-color: #f5f5f5;
 }
 
 /* ===========================
@@ -1755,98 +1828,96 @@ body.modal-open .rating-modal-backdrop {
 =========================== */
 
 .member-page {
-    padding-top: 6rem;
+  padding-top: 6rem;
 }
 
 .member-layout {
-    max-width: 520px;
-    margin: 0 auto;
-    background-color: #ffffff;
-    border-radius: 18px;
-    padding: 1.8rem 1.6rem 1.9rem;
-    box-shadow: 0 14px 30px rgba(0,0,0,0.06);
+  max-width: 520px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border-radius: 18px;
+  padding: 1.8rem 1.6rem 1.9rem;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.06);
 }
 
 .member-status {
-    font-size: 0.95rem;
-    color: #444;
-    margin-bottom: 1.2rem;
+  font-size: 0.95rem;
+  color: #444;
+  margin-bottom: 1.2rem;
 }
 
 .member-status-sub {
-    font-size: 0.85rem;
-    color: #777;
-    margin-top: 0.15rem;
+  font-size: 0.85rem;
+  color: #777;
+  margin-top: 0.15rem;
 }
 
 .member-tabs {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    border-radius: 999px;
-    background-color: #f4f2ee;
-    padding: 0.2rem;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  border-radius: 999px;
+  background-color: #f4f2ee;
+  padding: 0.2rem;
 }
 
 .member-tab-btn {
-    flex: 1;
-    border-radius: 999px;
-    border: none;
-    background: transparent;
-    font-size: 0.9rem;
-    padding: 0.45rem 0.6rem;
-    cursor: pointer;
-    transition:
-        background-color var(--transition-fast),
-        color var(--transition-fast),
-        box-shadow var(--transition-fast);
+  flex: 1;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.6rem;
+  cursor: pointer;
+  transition: background-color var(--transition-fast),
+    color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .member-tab-btn.active {
-    background-color: #ffffff;
-    color: var(--color-primary);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  background-color: #ffffff;
+  color: var(--color-primary);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
 .member-panel {
-    display: none;
-    margin-top: 0.4rem;
+  display: none;
+  margin-top: 0.4rem;
 }
 
 .member-panel.active {
-    display: block;
+  display: block;
 }
 
 .member-form {
-    display: grid;
-    gap: 0.9rem;
+  display: grid;
+  gap: 0.9rem;
 }
 
 .member-form-group label {
-    display: block;
-    font-size: 0.9rem;
-    color: #333;
+  display: block;
+  font-size: 0.9rem;
+  color: #333;
 }
 
 .member-form-group input {
-    width: 100%;
-    margin-top: 0.25rem;
-    border-radius: 12px;
-    border: 1px solid #ddd;
-    padding: 0.6rem 0.7rem;
-    font-family: inherit;
-    font-size: 0.9rem;
+  width: 100%;
+  margin-top: 0.25rem;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  padding: 0.6rem 0.7rem;
+  font-family: inherit;
+  font-size: 0.9rem;
 }
 
 .member-submit-btn {
-    margin-top: 0.4rem;
-    width: 100%;
+  margin-top: 0.4rem;
+  width: 100%;
 }
 
 .member-logout-btn {
-    margin-top: 1.2rem;
-    width: 100%;
-    justify-content: center;
+  margin-top: 1.2rem;
+  width: 100%;
+  justify-content: center;
 }
 
 /* ===========================
@@ -1854,50 +1925,99 @@ body.modal-open .rating-modal-backdrop {
 =========================== */
 
 .drink-rating {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.1rem;
-    font-size: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  font-size: 0.85rem;
 }
 
 .rating-stars {
-    display: inline-flex;
-    gap: 0.1rem;
-    cursor: pointer;
+  display: inline-flex;
+  gap: 0.1rem;
+  cursor: pointer;
 }
 
 .rating-star {
-    font-size: 1rem;
-    color: #ccc;
-    transition: color 0.18s ease;
+  font-size: 1rem;
+  color: #ccc;
+  transition: color 0.18s ease;
 }
 
 .rating-star.active {
-    color: #f4b400; /* 金色星星 */
+  color: #f4b400;
+  /* 金色星星 */
 }
 
 .rating-text {
-    display: block;
-    margin-top: 0.1rem;
+  display: block;
+  margin-top: 0.1rem;
 }
 
 .my-rating-comment {
-    margin-top: 0.05rem;
-    font-size: 0.82rem;
+  margin-top: 0.05rem;
+  font-size: 0.82rem;
 }
 
 /* 統一兩行文字顏色 */
 .drink-rating .rating-text,
 .drink-rating .my-rating-comment {
-    color: #777 !important;
+  color: #777 !important;
 }
 
 /* 周邊商品提醒僅供現場購買區塊 */
 .merch-note {
-    text-align: center;
-    font-size: 1rem;
-    color: #777;
-    line-height: 1.8;
-    padding: 1rem 0 0.5rem;
+  text-align: center;
+  font-size: 1rem;
+  color: #777;
+  line-height: 1.8;
+  padding: 1rem 0 0.5rem;
 }
+
+/* 全尺寸都用漢堡選單，讓用電腦跟手機一樣） */
+
+/* 漢堡按鈕會永遠顯示 */
+.nav-toggle {
+    display: block;
+}
+
+/* 桌機原本水平選單，改成下拉卡片，預設是收起的 */
+.main-nav {
+    position: absolute;
+    top: 64px;
+    right: 1.5rem;   /* 靠右 */
+    left: auto;
+
+    background-color: rgba(15,32,24,0.96);
+    border-radius: 18px;
+    padding: 0.9rem 1.1rem;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* 文字也靠右 */
+    gap: 0.8rem;
+
+    box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+
+    transition: max-height 0.26s ease-out, opacity 0.22s ease-out;
+}
+
+/* 漢堡選單裡面文字排版 */
+.main-nav a {
+    text-align: center;
+    width: 100%;
+    padding: 0.4rem 0;
+}
+
+/* 點漢堡後展開 */
+.main-nav.open {
+    max-height: 450px;
+    opacity: 1;
+    pointer-events: auto;
+}
+

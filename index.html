@@ -2,30 +2,33 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>index.html</title>
+    <!-- 網頁分頁名稱和logo圖示 -->
+    <title>首頁 - 檢茶官</title>
+    <link rel="icon" href="images/logo.png" type="image/png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
-<body>
 
-    <!-- Header（上方導覽列) -->
+<body>
+    <!-- Header，上面的導覽列 -->
     <header class="site-header">
         <div class="container nav-container">
 
-            <!-- Logo -->
-            <a href="#" class="logo">
-                <span class="logo-main">我們的品牌</span>
-                <span class="logo-sub">our brand</span>
+            <!-- 主畫面左上Logo跟檢茶官品牌名稱 -->
+            <a href="index.html#adSlider" class="logo">
+                <img src="images/logo.png" alt="檢茶官" class="logo-icon">
+                <span class="logo-text">檢茶官</span>
             </a>
 
             <!-- 手機版選單 -->
             <button class="nav-toggle" id="navToggle" aria-label="切換選單">
                 <span class="nav-toggle-line"></span>
                 <span class="nav-toggle-line"></span>
+                <span class="nav-toggle-line"></span>
             </button>
 
-            <!-- 導覽列項目-->
+            <!-- 導覽列的項目-->
             <nav class="main-nav" id="mainNav">
                 <a href="#adSlider">首頁</a>
                 <a href="#limited">季節品項</a>
@@ -260,10 +263,10 @@
                 <article class="team-card">
                     <div class="team-photo team-photo-placeholder"></div>
                     <div class="team-name">鄧宇珊<div>
-                    <div class="team-role">職務 / 分工</div>
-                    <p class="team-bio">
-                        這裡可以寫自己的自我介紹，例如負責啥之類的
-                    </p>
+                            <div class="team-role">職務 / 分工</div>
+                            <p class="team-bio">
+                                這裡可以寫自己的自我介紹，例如負責啥之類的
+                            </p>
                 </article>
 
                 <!-- 成員2 -->
@@ -365,4 +368,5 @@
         </div>
     </footer>
 </body>
+
 </html>
