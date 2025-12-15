@@ -147,7 +147,7 @@ body {
 .ad-slides {
     flex: 1;
     position: relative;
-    min-height: 120px;
+    min-height: 400px;
 }
 
 /* 單一廣告卡片 */
@@ -155,7 +155,7 @@ body {
     position: absolute;
     inset: 0;
     border-radius: 18px;
-    padding: 1.2rem 1.4rem;
+    padding: 2rem 2.2rem;
     background: radial-gradient(circle at top left, rgba(216,161,95,0.22), transparent 60%),
                 linear-gradient(135deg, #1a3126, #244337);
     box-shadow: var(--shadow-soft);
@@ -185,7 +185,7 @@ body {
 
 .ad-title {
     margin: 0 0 0.4rem;
-    font-size: 1.1rem;
+    font-size: 1.4rem;
 }
 
 .ad-text {
