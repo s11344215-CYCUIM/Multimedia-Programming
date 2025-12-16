@@ -1,18 +1,37 @@
 // ===========================
-// 手機版漢堡選單開關
+// 漢堡選單開關（全尺寸共用）
+// - 點漢堡：切換 .open
+// - 點選單項目：收起
+// - 點畫面其他地方 / 按 ESC：收起
 // ===========================
 const navToggle = document.getElementById("navToggle");
 const mainNav = document.getElementById("mainNav");
 
 if (navToggle && mainNav) {
-  navToggle.addEventListener("click", () => {
-    mainNav.classList.toggle("open");
+  const closeNav = () => mainNav.classList.remove("open");
+  const toggleNav = () => mainNav.classList.toggle("open");
+
+  navToggle.addEventListener("click", (e) => {
+    e.stopPropagation(); // 避免被外部點擊事件立刻關掉
+    toggleNav();
   });
 
+  // 點到選單連結：收起
   mainNav.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => {
-      mainNav.classList.remove("open");
-    });
+    link.addEventListener("click", () => closeNav());
+  });
+
+  // 點到頁面其他地方：收起
+  document.addEventListener("click", (e) => {
+    if (!mainNav.classList.contains("open")) return;
+    const clickedInside =
+      mainNav.contains(e.target) || navToggle.contains(e.target);
+    if (!clickedInside) closeNav();
+  });
+
+  // 按 ESC：收起
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeNav();
   });
 }
 
@@ -52,7 +71,7 @@ if (backToTopBtn) {
 }
 
 // ===========================
-// 聯絡表單阻止真實送出（如果有）
+// 聯絡表單阻止真實送出
 // ===========================
 const contactForm = document.querySelector(".contact-form");
 
@@ -436,38 +455,66 @@ if (cartListEl) {
   renderCartPage();
 }
 
+
 // ===========================
-// 飲品菜單頁：熱銷榜卡片互動
+// 飲品菜單頁：人氣排行
+// - 不用 order 重排，改用 transform
+// - 點左右卡片會像輪盤轉到中間
 // ===========================
-const rankCards = Array.from(document.querySelectorAll(".rank-card"));
+const wheel = document.getElementById("rankingWheel");
+const wheelCards = wheel ? Array.from(wheel.querySelectorAll(".rank-card")) : [];
 
-if (rankCards.length) {
-  function setFeatured(featuredIndex) {
-    const total = rankCards.length;
+if (wheel && wheelCards.length) {
+  let activeIndex = 0;
+  const total = wheelCards.length;
 
-    const leftIndex = (featuredIndex + 1) % total;
-    const rightIndex = (featuredIndex + 2) % total;
+  function normalizeOffset(offset, n) {
+    let x = ((offset % n) + n) % n;
+    if (x > n / 2) x -= n;
+    return x;
+  }
 
-    rankCards.forEach((card, i) => {
-      const isFeatured = i === featuredIndex;
-      card.classList.toggle("rank-featured", isFeatured);
+  function renderWheel() {
+    // 這裡的數字就是「輪盤的弧度與半徑」，想更像轉盤可調大一點
+    const radiusX = 360; // 水平半徑（越大會更像輪盤）
+    const liftY = 24;    // 垂直起伏（越大越有弧線感）
+    const stepDeg = 38;  // 每轉一步的角度
 
-      if (i === leftIndex) {
-        card.style.order = 1;
-      } else if (i === featuredIndex) {
-        card.style.order = 2;
-      } else if (i === rightIndex) {
-        card.style.order = 3;
-      }
+    wheelCards.forEach((card, i) => {
+      const offset = normalizeOffset(i - activeIndex, total);
+      const abs = Math.abs(offset);
+
+      const angle = offset * stepDeg * (Math.PI / 180);
+      const x = Math.sin(angle) * radiusX;
+      const y = -Math.cos(angle) * liftY; 
+
+      const scale = offset === 0 ? 1.02 : abs === 1 ? 0.92 : 0.88;
+      const opacity = offset === 0 ? 1 : abs === 1 ? 0.85 : 0.75;
+      const z = 10 - abs;
+
+      card.style.setProperty("--x", `${x}px`);
+      card.style.setProperty("--y", `${y}px`);
+      card.style.setProperty("--s", `${scale}`);
+      card.style.setProperty("--o", `${opacity}`);
+      card.style.setProperty("--z", `${z}`);
+
+      card.classList.toggle("is-center", offset === 0);
+
+      
     });
   }
 
-  setFeatured(0);
+  // 初始定位
+  renderWheel();
 
-  rankCards.forEach((card) => {
+  // 點卡片：輪盤轉到那張
+  wheelCards.forEach((card, i) => {
     card.addEventListener("click", () => {
-      const idx = rankCards.indexOf(card);
-      setFeatured(idx);
+      if (i === activeIndex) return;
+
+      // 用 requestAnimationFrame 讓更新更穩
+      activeIndex = i;
+      requestAnimationFrame(renderWheel);
     });
   });
 }

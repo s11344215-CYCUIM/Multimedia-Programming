@@ -20,66 +20,78 @@
           <span class="logo-text">檢茶官</span>
         </a>
 
-        <button class="nav-toggle" id="navToggle" aria-label="切換選單">
-          <span class="nav-toggle-line"></span>
-          <span class="nav-toggle-line"></span>
-          <span class="nav-toggle-line"></span>
-        </button>
+        <div class="nav-menu-wrapper">
+          <button class="nav-toggle" id="navToggle" aria-label="切換選單">
+            <span class="nav-toggle-line"></span>
+            <span class="nav-toggle-line"></span>
+            <span class="nav-toggle-line"></span>
+          </button>
 
-        <nav class="main-nav" id="mainNav">
-          <a href="index.html#adSlider">首頁</a>
-          <a href="index.html#limited">季節新品</a>
-          <a href="index.html#story">品牌故事</a>
-          <a href="index.html#craftsmen">匠心職人</a>
-          <a href="menu.html">飲品菜單</a>
-          <a href="merch.html">周邊商品</a>
-          <a href="index.html#about">關於我們</a>
-          <a href="member.html">會員專區</a>
-        </nav>
+          <nav class="main-nav" id="mainNav">
+            <a href="index.html#adSlider">首頁</a>
+            <a href="index.html#limited">季節新品</a>
+            <a href="index.html#story">品牌故事</a>
+            <a href="index.html#craftsmen">匠心職人</a>
+            <a href="menu.html">飲品菜單</a>
+            <a href="merch.html">周邊商品</a>
+            <a href="index.html#about">關於我們</a>
+            <a href="member.html">會員專區</a>
+          </nav>
+        </div>
       </div>
     </header>
 
     <main class="section menu-page">
       <div class="container">
         <h1 class="page-title">飲品菜單</h1>
-        <p class="page-subtitle">莓有你不行、伯爵鮮奶茶、百香QQ綠、焙韻厚奶、青韻綠茶</p>
 
         <!-- 熱銷排行榜 -->
         <section class="menu-ranking">
           <h2 class="menu-section-title">人氣排行</h2>
-          <div class="menu-ranking-grid">
+
+          <!-- 輪盤 -->
+          <div
+            class="ranking-wheel"
+            id="rankingWheel"
+            aria-label="人氣排行輪盤"
+          >
             <article class="rank-card">
-             <img
-                  src="images/焙韻厚奶.png"
-                  alt="焙韻厚奶"
-                  class="menu-drink-image-img"
+              <img
+                src="images/焙韻厚奶.png"
+                alt="焙韻厚奶"
+                class="menu-drink-image-img"
               />
               <span class="rank-tag">Top 1</span>
               <h3 class="rank-name">焙韻厚奶</h3>
-              <p class="rank-desc">深焙茶香直接衝出來搭配濃到不行的奶香一喝就愛上</p>
+              <p class="rank-desc">
+                深焙茶香直接衝出來搭配濃到不行的奶香一喝就愛上
+              </p>
             </article>
 
             <article class="rank-card">
-               <img
-                  src="images/百香QQ綠.png"
-                  alt="百香QQ綠"
-                  class="menu-drink-image-img"
+              <img
+                src="images/百香QQ綠.png"
+                alt="百香QQ綠"
+                class="menu-drink-image-img"
               />
               <span class="rank-tag">Top 2</span>
               <h3 class="rank-name">百香QQ綠</h3>
-              <p class="rank-desc">百香果酸甜大爆發配上清爽綠茶和QQ口感超級解渴
-</p>
+              <p class="rank-desc">
+                百香果酸甜大爆發配上清爽綠茶和QQ口感超級解渴
+              </p>
             </article>
 
             <article class="rank-card">
-               <img
-                  src="images/伯爵鮮奶茶.png"
-                  alt="伯爵鮮奶茶"
-                  class="menu-drink-image-img"
+              <img
+                src="images/伯爵鮮奶茶.png"
+                alt="伯爵鮮奶茶"
+                class="menu-drink-image-img"
               />
               <span class="rank-tag">Top 3</span>
               <h3 class="rank-name">伯爵鮮奶茶</h3>
-              <p class="rank-desc">伯爵茶佛手柑香氣超明顯加上鮮奶順到可以一直喝</p> 
+              <p class="rank-desc">
+                伯爵茶佛手柑香氣超明顯加上鮮奶順到可以一直喝
+              </p>
             </article>
           </div>
         </section>
@@ -114,8 +126,9 @@
                     ＋
                   </button>
                 </div>
-                <p>草莓的甜、山楂的酸、紅茶的香，加上綿密奶蓋，一杯喝得到戀愛感的酸甜滋味
-</p>
+                <p>
+                  草莓的甜、山楂的酸、紅茶的香，加上綿密奶蓋，一杯喝得到戀愛感的酸甜滋味
+                </p>
                 <p class="menu-drink-meta">售價：$90</p>
                 <div class="drink-rating" data-drink-id="drink1">
                   <div class="rating-stars">
@@ -158,8 +171,10 @@
                     ＋
                   </button>
                 </div>
-                <p>伯爵茶的清雅果香，融合鮮奶的柔順，一口就是經典又不膩的英式風味。</p>
-                <p class="menu-drink-meta">售價：$60 </p>
+                <p>
+                  伯爵茶的清雅果香，融合鮮奶的柔順，一口就是經典又不膩的英式風味。
+                </p>
+                <p class="menu-drink-meta">售價：$60</p>
                 <div class="drink-rating" data-drink-id="drink2">
                   <div class="rating-stars">
                     <span class="rating-star" data-star="1">★</span>
@@ -201,7 +216,9 @@
                     ＋
                   </button>
                 </div>
-                <p>深焙茶香搭上厚實奶香，濃郁順口、回韻十足，適合喜歡重口味奶茶的人。 </p>
+                <p>
+                  深焙茶香搭上厚實奶香，濃郁順口、回韻十足，適合喜歡重口味奶茶的人。
+                </p>
                 <p class="menu-drink-meta">售價：$80 起</p>
                 <div class="drink-rating" data-drink-id="drink3">
                   <div class="rating-stars">
@@ -244,8 +261,10 @@
                     ＋
                   </button>
                 </div>
-                <p>百香果的酸甜遇上綠茶的清香，再加上QQ配料，清爽又有口感，一杯喝完超順口。</p>
-                <p class="menu-drink-meta">售價：$75 </p>
+                <p>
+                  百香果的酸甜遇上綠茶的清香，再加上QQ配料，清爽又有口感，一杯喝完超順口。
+                </p>
+                <p class="menu-drink-meta">售價：$75</p>
                 <div class="drink-rating" data-drink-id="drink4">
                   <div class="rating-stars">
                     <span class="rating-star" data-star="1">★</span>
@@ -287,7 +306,9 @@
                     ＋
                   </button>
                 </div>
-                <p>淡雅茶香、清爽回甘，一杯最純粹的綠茶風味，喝起來輕盈無負擔。 </p>
+                <p>
+                  淡雅茶香、清爽回甘，一杯最純粹的綠茶風味，喝起來輕盈無負擔。
+                </p>
                 <p class="menu-drink-meta">售價：$50</p>
                 <div class="drink-rating" data-drink-id="drink5">
                   <div class="rating-stars">
@@ -508,10 +529,12 @@
       <div class="container footer-content">
         <div class="footer-info">
           <h3 class="footer-title">品牌總部資訊</h3>
-            <p>地址：桃園市中壢區中北路200號</p>
-            <p>電話：03-000-0000</p>
-            <p>營業時間：平日10:30-21:30&nbsp;&nbsp;&nbsp;&nbsp;假日11:00-21:30</p>
-            <p>Email：cycutea@gmail.com</p>
+          <p>地址：桃園市中壢區中北路200號</p>
+          <p>電話：03-000-0000</p>
+          <p>
+            營業時間：平日10:30-21:30&nbsp;&nbsp;&nbsp;&nbsp;假日11:00-21:30
+          </p>
+          <p>Email：cycutea@gmail.com</p>
         </div>
         <div class="footer-links">
           <a
