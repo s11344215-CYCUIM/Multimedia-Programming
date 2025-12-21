@@ -145,6 +145,38 @@ if (adSlides.length) {
   startAdAutoPlay();
 }
 
+// 首頁廣告，點整張slide可跳轉
+// 同頁錨點直接移過去
+// 跨頁才做淡出轉場
+adSlides.forEach((slide) => {
+  slide.style.cursor = "pointer";
+
+  slide.addEventListener("click", (e) => {
+    if (e.target.closest("a, button")) return;
+
+    const link = slide.dataset.link;
+    if (!link) return;
+
+    // ✅ 同頁錨點：只滑動，不淡出（避免整頁變透明卡住）
+    if (link.startsWith("#")) {
+      const target = document.querySelector(link);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth" });
+      } else {
+        // 找不到就至少更新 hash（方便 debug）
+        window.location.hash = link;
+      }
+      return;
+    }
+
+    // ✅ 其他情況：才做淡出換頁
+    document.body.classList.add("page-leave");
+    setTimeout(() => {
+      window.location.href = link;
+    }, 220);
+  });
+});
+
 // ===========================
 // 購物車共用工具（localStorage）
 // ===========================
@@ -1127,7 +1159,7 @@ function initRatings() {
 // 在有評分區塊的頁面初始化
 initRatings();
 
-// 換頁淡出轉場
+// 換頁淡出轉場（修正版：同頁 hash 不淡出）
 document.addEventListener("click", (e) => {
   const a = e.target.closest("a");
   if (!a) return;
@@ -1135,20 +1167,38 @@ document.addEventListener("click", (e) => {
   const href = a.getAttribute("href");
   if (!href) return;
 
-  // 不處理的情況：新分頁、外部連結、純錨點
+  // 不處理新分頁、外部連結
   if (a.target === "_blank") return;
-  if (href.startsWith("http")) return;
+  if (/^(https?:)?\/\//i.test(href)) return;
+
+  // 把 href 轉成完整 URL
+  const url = new URL(href, window.location.href);
+
+  const samePage = url.pathname === window.location.pathname;
+
+  // 同頁且直接移動
+  if (samePage && url.hash) {
+    const target = document.querySelector(url.hash);
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: "smooth" });
+      history.pushState(null, "", url.hash);
+    }
+    return;
+  }
+
   if (href.startsWith("#")) return;
 
+  // 跨頁淡出
   e.preventDefault();
   document.body.classList.add("page-leave");
 
   setTimeout(() => {
-    window.location.href = href;
+    window.location.href = url.href;
   }, 220);
 });
 
-// 進頁淡入，確保回到正常
+// 進頁淡入
 window.addEventListener("pageshow", () => {
   document.body.classList.remove("page-leave");
 });
