@@ -343,6 +343,36 @@ body.page-leave {
   gap: 0.75rem;
 }
 
+/* hero 左右分欄 */
+.hero-split {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: center;
+  gap: 2rem;
+}
+
+/* 左邊文字 */
+.hero-left {
+  position: relative;
+  z-index: 2;
+}
+
+/* 右邊 Logo 區 */
+.hero-right {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none; /* 純視覺，不干擾點擊 */
+}
+
+/* 右側大 Logo 本體 */
+.hero-big-logo {
+  width: min(420px, 70%);
+  max-width: 100%;
+  opacity: 0.85;
+  filter: drop-shadow(0 30px 80px rgba(0, 0, 0, 0.35));
+}
+
 /* 按鈕樣式 */
 .btn {
   display: inline-flex;
@@ -487,6 +517,15 @@ body.page-leave {
   font-size: 0.85rem;
   color: #666;
   margin-top: 0.75rem;
+}
+
+.limited-image {
+  width: 100%;
+  height: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  border-radius: 20px;
+  display: block;
 }
 
 /* 卡片三欄 */

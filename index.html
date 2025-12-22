@@ -130,21 +130,32 @@
     <section class="hero" id="hero">
         <div class="hero-overlay"></div>
 
-        <div class="container hero-content">
-            <p class="hero-tagline">小標語放這</p>
-
-            <h1 class="hero-title">重點標語放這，你們看這排版行不</h1>
-
+        <div class="container hero-content hero-split">
+        <!-- 左側：文字 -->
+        <div class="hero-left">
+            <p class="hero-tagline">檢茶官</p>
+            <h1 class="hero-title">一葉初心，一杯本味</h1>
             <p class="hero-text">
-                來點厲害一點的形容<br>
-                來點厲害一點的形容part2
+            檢茶官，把關每一片茶葉<br>
+            只讓真正好的，走到你面前
             </p>
 
             <div class="hero-actions">
-                <a href="#limited" class="btn primary-btn">看看本季新品</a>
-                <a href="#story" class="btn ghost-btn">了解品牌故事</a>
+            <a href="#limited" class="btn primary-btn">看看本季新品</a>
+            <a href="#story" class="btn ghost-btn">了解品牌故事</a>
             </div>
         </div>
+
+        <!-- 右側：大 Logo -->
+        <div class="hero-right">
+            <img
+            src="images/logo.png"
+            alt="檢茶官 Logo"
+            class="hero-big-logo"
+            />
+        </div>
+        </div>
+
     </section>
 
     <main>
@@ -155,16 +166,19 @@
                 <p class="section-tag">SEASONAL</p>
                 <h2 class="section-title">季節限定</h2>
                 <p class="section-subtitle">
-                    想到的季節飲料
+                    Crafted for the Season<br>
+                    這一季，只為這杯茶
                 </p>
             </div>
 
             <div class="container limited-grid">
                 <!-- 假圖片框（之後可換成 <img>） -->
                 <div class="limited-image-card">
-                    <div class="limited-image-placeholder">
-                        可以放照片在這
-                    </div>
+                    <img
+                        src="images/莓你不行.png"
+                        alt="季節限定飲品｜莓你不行"
+                        class="limited-image"
+                    />
                 </div>
 
                 <!-- 右側文字介紹 -->
@@ -192,7 +206,7 @@
         <section class="section section-alt" id="story">
             <div class="container section-header">
                 <p class="section-tag">ABOUT</p>
-                <h2 class="section-title">「一葉初心，一杯本味」</h2>
+                <h2 class="section-title">品牌故事</h2>
                 <p class="section-subtitle">
                     One Leaf, One True Taste<br>
                     「從一片茶葉開始、不忘初衷」
@@ -240,55 +254,42 @@
         <section class="section" id="craftsmen">
             <div class="container section-header">
                 <p class="section-tag">CRAFTSMEN</p>
-                <h2 class="section-title">為何以茶葉聞名</h2>
+                <h2 class="section-title">匠心職人</h2>
                 <p class="section-subtitle">
-                    Our Commitment to Tea
+                    Our Commitment to Tea<br>
+                    為何以茶葉聞名
                 </p>
             </div>
 
             <div class="container craftsmen-grid">
                 <div class="craftsmen-text">
                     <p>
-                        每一款茶葉，皆來自具備完整來源與產地紀錄的茶園，從栽種、採摘到製作過程皆可追溯
-                    </p>
-                    <p>
-                        對我們而言，茶葉不是原料，而是品牌的根本
-                    </p>
-                    <p>
-                        我們所使用的每一款茶葉，皆來自具備完整來源與產地紀錄的茶園，從栽種、採摘到製作過程皆可追溯
-                    </p>
-                    <p>
-                        茶樹的生長環境、海拔高度、採收季節，甚至當年度的氣候條件，都會影響最終的風味表現，因此我們不以「大量穩定」為唯一標準，而是重視每一次收成的實際狀態
-                    </p>
-                    <p>
-                        我們相信，一杯好茶不需要過多修飾，當茶葉本身足夠優秀，只需適當的沖煮與時間，它自然會說話
-                    </p>
-                    <p>
-                        正因如此，我們寧願花更多時間等待一批真正成熟的茶葉，也不願為了效率犧牲品質
-                    </p>
-                    <p>
-                        這份對茶葉的尊重與專業，是品牌最核心、也最驕傲的價值所在
+                        我們所使用的每一款茶葉，皆來自具備完整來源與產地紀錄的茶園，從栽種、採摘到製作過程皆可追溯。
+                        對我們而言，茶葉不是原料，而是品牌的根本。茶樹的生長環境、海拔高度、採收季節，甚至當年度的氣候條件，
+                        都會影響最終的風味表現，因此我們不以「大量穩定」為唯一標準，而是重視每一次收成的實際狀態。
+                        我們寧願花更多時間等待一批真正成熟的茶葉，也不願為了效率犧牲品質。這份對茶葉的尊重與專業，是品牌最核心、也最驕傲的價值所在。
                     </p>
                 </div>
 
                 <div class="craftsmen-gallery">
-                    <div class="gallery-item">產地篩選與長期合作 : 只與重視土地管理與栽培品質的茶農合作，建立穩定且透明的夥伴關係</div>
-                    <div class="gallery-item">人工採摘與製茶監控 : 確保茶菁成熟度與品質，避免機械化對風味造成的破壞</div>
-                    <div class="gallery-item">專業品鑑與反覆測試 : 由團隊進行多輪沖泡測試，確認香氣、口感與回甘表現</div>
-                    <div class="gallery-item">完整認證與檢驗 : 茶葉皆通過相關安全檢驗與品質認證，確保飲用安全與穩定品質</div>
+                    <div class="gallery-item">產地篩選與長期合作：只與重視土地管理與栽培品質的茶農合作</div>
+                    <div class="gallery-item">人工採摘與製茶監控：避免機械化對風味造成的破壞</div>
+                    <div class="gallery-item">專業品鑑與反覆測試：多次沖泡測試，確認香氣、口感與回甘表現</div>
+                    <div class="gallery-item">完整檢驗認證：茶葉皆通過相關安全檢驗與品質認證</div>
                 </div>
             </div>
         </section>
 
         <!-- ===========================
-             關於我們（四位成員）
+             關於我們
         ============================ -->
         <section class="section about-section" id="about">
             <div class="container section-header">
                 <p class="section-tag">ABOUT US</p>
                 <h2 class="section-title">關於我們</h2>
                 <p class="section-subtitle">
-                    這裡是預留給每隔人介紹的地方
+                    On the Side of True Taste<br>
+                    我們，站在風味的那一側
                 </p>
             </div>
 
@@ -297,10 +298,10 @@
                 <article class="team-card">
                     <div class="team-photo team-photo-placeholder"></div>
                     <div class="team-name">鄧宇珊<div>
-                            <div class="team-role">職務 / 分工</div>
-                            <p class="team-bio">
-                                這裡可以寫自己的自我介紹，例如負責啥之類的
-                            </p>
+                    <div class="team-role">職務 / 分工</div>
+                    <p class="team-bio">
+                        這裡可以寫自己的自我介紹，例如負責啥之類的
+                    </p>
                 </article>
 
                 <!-- 成員2 -->
@@ -336,14 +337,15 @@
         </section>
 
         <!-- ===========================
-             加盟專區（表單移到這裡）
+             加盟專區
         ============================ -->
         <section class="section" id="franchise">
             <div class="container section-header">
                 <p class="section-tag">FRANCHISE</p>
                 <h2 class="section-title">加盟專區</h2>
                 <p class="section-subtitle">
-                    想了解加盟相關資訊，可以先透過下方表單留下聯絡方式與大致需求<br>
+                    Sharing What We Believe In<br>
+                    我們找的不是夥伴，是同道
                 </p>
             </div>
 
