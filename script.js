@@ -487,6 +487,185 @@ if (cartListEl) {
   renderCartPage();
 }
 
+// ===========================
+// 購物車彈窗（全站）
+// - 點右下角購物車：打開彈窗
+// - 維持 cart.html 可用作備援（JS 失效時仍能進頁面）
+// ===========================
+
+function ensureCartModalExists() {
+  if (document.getElementById("cartModalBackdrop")) return;
+
+  const backdrop = document.createElement("div");
+  backdrop.id = "cartModalBackdrop";
+  backdrop.className = "cart-modal-backdrop";
+  backdrop.innerHTML = `
+    <div class="cart-modal" role="dialog" aria-modal="true" aria-label="購物車">
+      <div class="cart-modal-card">
+        <button type="button" class="cart-modal-close" id="cartModalClose" aria-label="關閉">×</button>
+        <h3 class="cart-modal-title">購物車</h3>
+        <div id="cartModalEmpty" class="cart-modal-empty" style="display:none">購物車目前是空的，<a href="menu.html">先去逛逛飲料</a>吧。</div>
+        <div id="cartModalList" class="cart-modal-list"></div>
+        <div id="cartModalSummary" class="cart-modal-summary" style="display:none">
+          <div class="cart-modal-summary-row">
+            <span>小計</span>
+            <span id="cartModalSubtotal">$0</span>
+          </div>
+          <div class="cart-modal-actions">
+            <a href="checkout.html" class="btn primary-btn" id="cartModalCheckout">前往結帳</a>
+            <button type="button" class="btn secondary-btn" id="cartModalCloseBtn">繼續逛</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(backdrop);
+}
+
+function openCartModal() {
+  ensureCartModalExists();
+  const backdrop = document.getElementById("cartModalBackdrop");
+  if (!backdrop) return;
+
+  renderCartModal();
+  backdrop.classList.add("show");
+  document.body.classList.add("modal-open");
+}
+
+function closeCartModal() {
+  const backdrop = document.getElementById("cartModalBackdrop");
+  if (!backdrop) return;
+  backdrop.classList.remove("show");
+  document.body.classList.remove("modal-open");
+}
+
+function renderCartModal() {
+  const listEl = document.getElementById("cartModalList");
+  const emptyEl = document.getElementById("cartModalEmpty");
+  const summaryEl = document.getElementById("cartModalSummary");
+  const subtotalEl = document.getElementById("cartModalSubtotal");
+  if (!listEl || !emptyEl || !summaryEl || !subtotalEl) return;
+
+  const cart = loadCart();
+  if (!cart.length) {
+    emptyEl.style.display = "block";
+    summaryEl.style.display = "none";
+    listEl.innerHTML = "";
+    subtotalEl.textContent = "$0";
+    return;
+  }
+
+  emptyEl.style.display = "none";
+  summaryEl.style.display = "block";
+
+  let html = "";
+  let subtotal = 0;
+
+  cart.forEach((item, index) => {
+    const itemTotal = item.price * item.quantity;
+    subtotal += itemTotal;
+
+    const parts = [item.size, item.ice, item.sugar];
+    if (item.toppings && item.toppings.length) {
+      parts.push("加料：" + item.toppings.join("、"));
+    }
+    if (item.note) {
+      parts.push("備註：" + item.note);
+    }
+    const optionsText = parts.filter(Boolean).join(" / ");
+
+    html += `
+      <div class="cart-item" data-index="${index}">
+        <div class="cart-item-main">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-options">${optionsText || ""}</div>
+        </div>
+        <div class="cart-item-side">
+          <span class="cart-item-price">$${item.price}</span>
+          <div class="cart-item-qty">
+            <button type="button" data-action="decrease">-</button>
+            <span class="cart-item-qty-value">${item.quantity}</span>
+            <button type="button" data-action="increase">+</button>
+          </div>
+          <button type="button" class="cart-item-remove" data-action="remove">刪除</button>
+        </div>
+      </div>
+    `;
+  });
+
+  listEl.innerHTML = html;
+  subtotalEl.textContent = `$${subtotal}`;
+}
+
+// 綁定：右下角購物車 -> 開彈窗
+const cartFloatingBtn = document.querySelector(".cart-floating");
+if (cartFloatingBtn) {
+  cartFloatingBtn.addEventListener("click", (e) => {
+    // 讓 cart.html 仍可用作備援，所以只有在 JS 正常跑時才阻止跳頁
+    e.preventDefault();
+    openCartModal();
+  });
+}
+
+// 彈窗事件（用委派，因為 DOM 會被動態插入）
+document.addEventListener("click", (e) => {
+  // 關閉：X、繼續逛
+  if (e.target && e.target.id === "cartModalClose") {
+    closeCartModal();
+  }
+  if (e.target && e.target.id === "cartModalCloseBtn") {
+    closeCartModal();
+  }
+
+  // 點遮罩關閉
+  const backdrop = document.getElementById("cartModalBackdrop");
+  if (backdrop && e.target === backdrop) {
+    closeCartModal();
+  }
+});
+
+// 彈窗內 + / - / 刪除
+document.addEventListener("click", (e) => {
+  const listEl = document.getElementById("cartModalList");
+  if (!listEl) return;
+  if (!listEl.contains(e.target)) return;
+
+  const action = e.target.dataset.action;
+  if (!action) return;
+
+  const itemEl = e.target.closest(".cart-item");
+  if (!itemEl) return;
+  const index = Number(itemEl.dataset.index);
+  const cart = loadCart();
+  const item = cart[index];
+  if (!item) return;
+
+  if (action === "increase") {
+    item.quantity += 1;
+  } else if (action === "decrease") {
+    item.quantity -= 1;
+    if (item.quantity <= 0) {
+      cart.splice(index, 1);
+    }
+  } else if (action === "remove") {
+    cart.splice(index, 1);
+  }
+
+  saveCart(cart);
+  updateCartBadge();
+  renderCartModal();
+});
+
+// ESC 關彈窗
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  const backdrop = document.getElementById("cartModalBackdrop");
+  if (backdrop && backdrop.classList.contains("show")) {
+    closeCartModal();
+  }
+});
+
 
 // ===========================
 // 飲品菜單頁：人氣排行
@@ -673,23 +852,38 @@ function setCurrentUser(user) {
 // 會員頁 UI 更新
 function updateMemberStatusUI() {
   const statusEl = document.getElementById("memberStatus");
-  const logoutBtn = document.getElementById("logoutBtn");
-
   if (!statusEl) return; // 不在 member.html 就跳出
 
+  const authSection = document.getElementById("memberAuth");
+  const dashboardSection = document.getElementById("memberDashboard");
+  const nameEl = document.getElementById("memberUsername");
+  const logoutBtn = document.getElementById("logoutBtn");
+
   const user = getCurrentUser();
+
   if (user) {
-    statusEl.innerHTML = `
-            <p>嗨，<strong>${user.name}</strong>，歡迎回來。</p>
-            <p class="member-status-sub">你可以在菜單頁幫飲品評分</p>
-        `;
+    // 會員已登入：顯示會員中心，收起登入/註冊
+    if (authSection) authSection.style.display = "none";
+    if (dashboardSection) dashboardSection.style.display = "block";
+    if (nameEl) nameEl.textContent = user.name || "會員";
+
+    // 會員中心的登出按鈕
     if (logoutBtn) logoutBtn.style.display = "inline-flex";
-  } else {
+
     statusEl.innerHTML = `
-            <p>目前尚未登入。</p>
-            <p class="member-status-sub">註冊的資料只會保存在你的瀏覽器裡，不會傳到任何伺服器</p>
-        `;
+      <p>嗨，<strong>${user.name}</strong>，歡迎回來。</p>
+      <p class="member-status-sub">你可以在菜單頁幫飲品評分</p>
+    `;
+  } else {
+    // 尚未登入：顯示登入/註冊，收起會員中心
+    if (authSection) authSection.style.display = "block";
+    if (dashboardSection) dashboardSection.style.display = "none";
     if (logoutBtn) logoutBtn.style.display = "none";
+
+    statusEl.innerHTML = `
+      <p>目前尚未登入。</p>
+      <p class="member-status-sub">註冊的資料只會保存在你的瀏覽器裡，不會傳到任何伺服器</p>
+    `;
   }
 }
 
@@ -785,10 +979,129 @@ if (memberTabButtons.length) {
 // 若在 member.html，初始化狀態
 updateMemberStatusUI();
 
+// 會員中心：右側訂單 tab（純前端示意）
+const orderTabs = document.querySelectorAll(".order-tab");
+if (orderTabs.length) {
+  const emptyTitle = document.querySelector(".order-empty-title");
+
+  const tabLabelMap = {
+    all: "尚未有訂單",
+    pay: "尚未有待付款的訂單",
+    ship: "尚未有待製作的訂單",
+    receive: "尚未有待取的訂單",
+    done: "尚未有已完成的訂單",
+    cancel: "尚未有取消的訂單",
+    refund: "尚未有退貨/退款的訂單",
+  };
+
+  orderTabs.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      orderTabs.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      const key = btn.dataset.orderTab;
+      if (emptyTitle && key && tabLabelMap[key]) {
+        emptyTitle.textContent = tabLabelMap[key];
+      }
+    });
+  });
+}
+
+// 會員中心：編輯個人簡介（示意）
+const memberEditBtn = document.getElementById("memberEditBtn");
+if (memberEditBtn) {
+  memberEditBtn.addEventListener("click", () => {
+    alert("目前為期末專案前端示意");
+  });
+}
+
 // ===========================
 // 飲品評分（只有前端） – 彈窗版
 // ===========================
 const RATINGS_KEY = "site_ratings";
+
+// ===========================
+// 預設假評價（第一次進菜單頁就會自動塞進 localStorage）
+// - 只影響「平均分/評分數」
+// - 真的會員評分依然會覆蓋/新增
+// ===========================
+function seedDefaultRatingsIfEmpty() {
+  // 已經有人評過（或你之前測試過）就不要動
+  const exists = localStorage.getItem(RATINGS_KEY);
+  if (exists) return;
+
+  // 這些 drinkId 要跟 menu.html 的 data-drink-id 對上
+  // 如果你之後新增飲品，只要在這裡補一段就好
+  const defaults = {
+    drink1: {
+      userRatings: {
+        "mika@demo.com": 5,
+        "han@demo.com": 4,
+        "yuzu@demo.com": 5,
+      },
+      userComments: {
+        "mika@demo.com": "茶香很乾淨，尾韻有回甘",
+        "han@demo.com": "不會澀，冰一點更順",
+      },
+    },
+    drink2: {
+      userRatings: {
+        "riku@demo.com": 4,
+        "noa@demo.com": 4,
+        "sena@demo.com": 5,
+        "kai@demo.com": 4,
+      },
+      userComments: {
+        "sena@demo.com": "奶香跟茶底比例超舒服。",
+      },
+    },
+    drink3: {
+      userRatings: {
+        "rina@demo.com": 5,
+        "aoi@demo.com": 5,
+        "tom@demo.com": 4,
+      },
+      userComments: {
+        "rina@demo.com": "果香酸甜剛好，奶蓋很加分。",
+      },
+    },
+    drink4: {
+      userRatings: {
+        "jay@demo.com": 4,
+        "mei@demo.com": 3,
+        "kyo@demo.com": 4,
+      },
+      userComments: {
+        "kyo@demo.com": "甜度半糖最剛好。",
+      },
+    },
+    drink5: {
+      userRatings: {
+        "zoe@demo.com": 5,
+        "liam@demo.com": 4,
+      },
+      userComments: {
+        "zoe@demo.com": "香氣很穩，熱飲也耐喝。",
+      },
+    },
+  };
+
+  const seeded = {};
+  Object.entries(defaults).forEach(([drinkId, payload]) => {
+    const ratings = payload.userRatings || {};
+    const values = Object.values(ratings);
+    const total = values.reduce((sum, v) => sum + (Number(v) || 0), 0);
+    const count = values.length;
+
+    seeded[drinkId] = {
+      total,
+      count,
+      userRatings: ratings,
+      userComments: payload.userComments || {},
+    };
+  });
+
+  localStorage.setItem(RATINGS_KEY, JSON.stringify(seeded));
+}
 
 function loadRatings() {
   try {
@@ -1138,6 +1451,9 @@ if (ratingModalDeleteBtn) {
 
 // 初始化：讓菜單上的評分區變成「點了就跳出彈窗」
 function initRatings() {
+  // 先塞預設評價（只在第一次）
+  seedDefaultRatingsIfEmpty();
+
   const ratingBlocks = document.querySelectorAll(".drink-rating");
   if (!ratingBlocks.length) return;
 
@@ -1201,4 +1517,38 @@ document.addEventListener("click", (e) => {
 // 進頁淡入
 window.addEventListener("pageshow", () => {
   document.body.classList.remove("page-leave");
+});
+
+
+const cartBtn = document.getElementById('cartBtn');
+
+if (cartBtn) {
+  cartBtn.addEventListener('click', () => {
+    openCartModal(); // 購物車彈出 function
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const sideLinks = document.querySelectorAll(".member-side-link[data-panel]");
+  const panels = document.querySelectorAll(".member-panel[data-panel]");
+
+  if (!sideLinks.length || !panels.length) return;
+
+  sideLinks.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.panel;
+
+      // 切換側欄 active
+      sideLinks.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      // 切換右側內容
+      panels.forEach((panel) => {
+        panel.classList.toggle(
+          "active",
+          panel.dataset.panel === target
+        );
+      });
+    });
+  });
 });

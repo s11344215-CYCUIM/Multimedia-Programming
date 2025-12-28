@@ -2,7 +2,6 @@
 <html lang="zh-Hant">
   <head>
     <meta charset="UTF-8" />
-    <!-- 網頁分頁名稱和logo圖示 -->
     <title>會員專區 - 檢茶官</title>
     <link rel="icon" href="images/logo.png" type="image/png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,7 +13,6 @@
   <body>
     <header class="site-header">
       <div class="container nav-container">
-        <!-- 主畫面左上Logo跟檢茶官品牌名稱 -->
         <a href="index.html#adSlider" class="logo">
           <img src="images/logo.png" alt="檢茶官" class="logo-icon" />
           <span class="logo-text">檢茶官</span>
@@ -44,104 +42,225 @@
     <main class="section member-page">
       <div class="container">
         <h1 class="page-title">會員專區</h1>
-        <p class="page-subtitle">這裡只會用瀏覽器暫存你的資料<br /></p>
 
-        <div class="member-layout">
-          <!-- 上方顯示登入狀態 -->
-          <div class="member-status" id="memberStatus">
-            <!-- 由 script.js 動態更新 -->
-          </div>
+        <!-- 尚未登入：顯示登入 / 註冊 -->
+        <section id="memberAuth" class="member-auth" aria-label="會員登入註冊">
+          <div class="member-layout">
+            <div class="member-status" id="memberStatus"></div>
 
-          <!-- Tab 切換：登入 / 註冊 -->
-          <div class="member-tabs">
-            <button
-              type="button"
-              class="member-tab-btn active"
-              data-tab-target="loginPanel"
-            >
-              會員登入
-            </button>
-            <button
-              type="button"
-              class="member-tab-btn"
-              data-tab-target="registerPanel"
-            >
-              新會員註冊
-            </button>
-          </div>
-
-          <!-- 登入表單 -->
-          <section class="member-panel active" id="loginPanel">
-            <form id="loginForm" class="member-form">
-              <div class="member-form-group">
-                <label for="login-email">Email</label>
-                <input
-                  type="email"
-                  id="login-email"
-                  required
-                  placeholder="請輸入註冊時使用的 Email"
-                />
-              </div>
-              <div class="member-form-group">
-                <label for="login-password">密碼</label>
-                <input
-                  type="password"
-                  id="login-password"
-                  required
-                  placeholder="請輸入密碼"
-                />
-              </div>
-              <button type="submit" class="btn primary-btn member-submit-btn">
-                登入
+            <div class="member-tabs">
+              <button
+                type="button"
+                class="member-tab-btn active"
+                data-tab-target="loginPanel"
+              >
+                會員登入
               </button>
-            </form>
-          </section>
-
-          <!-- 註冊表單 -->
-          <section class="member-panel" id="registerPanel">
-            <form id="registerForm" class="member-form">
-              <div class="member-form-group">
-                <label for="register-name">暱稱 / 姓名</label>
-                <input
-                  type="text"
-                  id="register-name"
-                  required
-                  placeholder="你的稱呼"
-                />
-              </div>
-              <div class="member-form-group">
-                <label for="register-email">Email</label>
-                <input
-                  type="email"
-                  id="register-email"
-                  required
-                  placeholder="登入帳號時會用的Email"
-                />
-              </div>
-              <div class="member-form-group">
-                <label for="register-password">密碼</label>
-                <input
-                  type="password"
-                  id="register-password"
-                  required
-                  placeholder="請設定一組密碼"
-                />
-              </div>
-              <button type="submit" class="btn primary-btn member-submit-btn">
-                註冊
+              <button
+                type="button"
+                class="member-tab-btn"
+                data-tab-target="registerPanel"
+              >
+                新會員註冊
               </button>
-            </form>
-          </section>
+            </div>
 
-          <button
-            type="button"
-            class="btn secondary-btn member-logout-btn"
-            id="logoutBtn"
-            style="display: none"
-          >
-            登出
-          </button>
-        </div>
+            <section class="member-panel active" id="loginPanel">
+              <form id="loginForm" class="member-form">
+                <div class="member-form-group">
+                  <label for="login-email">Email</label>
+                  <input
+                    type="email"
+                    id="login-email"
+                    required
+                    placeholder="請輸入註冊時使用的 Email"
+                  />
+                </div>
+                <div class="member-form-group">
+                  <label for="login-password">密碼</label>
+                  <input
+                    type="password"
+                    id="login-password"
+                    required
+                    placeholder="請輸入密碼"
+                  />
+                </div>
+                <button type="submit" class="btn primary-btn member-submit-btn">
+                  登入
+                </button>
+              </form>
+            </section>
+
+            <section class="member-panel" id="registerPanel">
+              <form id="registerForm" class="member-form">
+                <div class="member-form-group">
+                  <label for="register-name">暱稱 / 姓名</label>
+                  <input
+                    type="text"
+                    id="register-name"
+                    required
+                    placeholder="你的稱呼"
+                  />
+                </div>
+                <div class="member-form-group">
+                  <label for="register-email">Email</label>
+                  <input
+                    type="email"
+                    id="register-email"
+                    required
+                    placeholder="登入帳號時會用的 Email"
+                  />
+                </div>
+                <div class="member-form-group">
+                  <label for="register-password">密碼</label>
+                  <input
+                    type="password"
+                    id="register-password"
+                    required
+                    placeholder="請設定一組密碼"
+                  />
+                </div>
+                <button type="submit" class="btn primary-btn member-submit-btn">
+                  註冊
+                </button>
+              </form>
+            </section>
+          </div>
+        </section>
+
+        <!-- 已登入：顯示會員中心 -->
+        <section
+          id="memberDashboard"
+          class="member-dashboard"
+          aria-label="會員中心"
+          style="display: none"
+        >
+          <div class="member-center">
+            <!-- 左側：側欄 -->
+            <aside class="member-sidebar" aria-label="會員側欄">
+              <div class="member-profile">
+                <div class="member-avatar" aria-hidden="true"></div>
+                <div class="member-profile-text">
+                  <div class="member-username" id="memberUsername">會員</div>
+                  <button
+                    type="button"
+                    class="member-edit"
+                    id="memberEditBtn"
+                    aria-label="編輯個人簡介"
+                  >
+                    ✎ 編輯個人簡介
+                  </button>
+                </div>
+              </div>
+
+              <nav class="member-side-nav" aria-label="會員功能">
+                <button
+                  type="button"
+                  class="member-side-link active"
+                  data-panel="account"
+                >
+                  <span class="member-side-ico" aria-hidden="true">👤</span>
+                  <span>我的帳戶</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="member-side-link"
+                  data-panel="orders"
+                >
+                  <span class="member-side-ico" aria-hidden="true">🧾</span>
+                  <span>購買清單</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="member-side-link"
+                  data-panel="notice"
+                >
+                  <span class="member-side-ico" aria-hidden="true">🔔</span>
+                  <span>通知總覽</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="member-side-link"
+                  data-panel="coupon"
+                >
+                  <span class="member-side-ico" aria-hidden="true">🎟️</span>
+                  <span>我的優惠券</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="member-side-link"
+                  data-panel="points"
+                >
+                  <span class="member-side-ico" aria-hidden="true">🪙</span>
+                  <span>我的點數</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="member-side-link"
+                  data-panel="refund"
+                >
+                  <span class="member-side-ico" aria-hidden="true">💳</span>
+
+              <span>交易支付及退款查詢</span>
+                </button>
+              </nav>
+
+              <section class="member-panel active" data-panel="account">
+                <h2>我的帳戶</h2>
+              </section>
+
+              <section class="member-panel" data-panel="orders">
+                <h2>購買清單</h2>
+              </section>
+
+              <section class="member-panel" data-panel="notice">
+                <h2>通知總覽</h2>
+              </section>
+
+              <section class="member-panel" data-panel="coupon">
+                <h2>我的優惠券</h2>
+              </section>
+
+              <section class="member-panel" data-panel="points">
+                <h2>我的點數</h2>
+              </section>
+
+              <section class="member-panel" data-panel="refund">
+                <h2>交易支付及退款查詢</h2>
+              </section>
+
+
+              <button type="button" class="btn secondary-btn member-logout-btn" id="logoutBtn">
+                登出
+              </button>
+            </aside>
+
+            <!-- 右側：內容 -->
+            <section class="member-main" aria-label="會員內容">
+              <div class="order-tabs" role="tablist" aria-label="訂單狀態">
+                <button class="order-tab" type="button" data-order-tab="all">全部</button>
+                <button class="order-tab active" type="button" data-order-tab="pay">待付款</button>
+                <button class="order-tab" type="button" data-order-tab="ship">待製作</button>
+                <button class="order-tab" type="button" data-order-tab="receive">待取</button>
+                <button class="order-tab" type="button" data-order-tab="done">已完成</button>
+                <button class="order-tab" type="button" data-order-tab="cancel">取消</button>
+                <button class="order-tab" type="button" data-order-tab="refund">退貨/退款</button>
+              </div>
+
+              <div class="order-panel" id="orderPanel">
+                <div class="order-empty">
+                  <div class="order-empty-illus" aria-hidden="true">📋</div>
+                  <p class="order-empty-title">尚未有訂單</p>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
       </div>
     </main>
 
@@ -175,9 +294,15 @@
       </div>
     </footer>
 
-    <a href="cart.html" class="fab cart-floating" aria-label="購物車">
-      🛒
-      <span class="cart-count-badge" id="cartCount">0</span>
-    </a>
+    <!-- 懸浮購物車 -->
+    <button
+    type="button"
+    id="cartBtn"
+    class="fab cart-floating"
+    aria-label="購物車"
+    >
+    🛒
+    <span class="cart-count-badge" id="cartCount">0</span>
+    </button>
   </body>
 </html>

@@ -203,7 +203,7 @@
         </section>
 
         <!-- 品牌理念之類的 -->
-        <section class="section section-alt" id="story">
+        <section class="section section-alt story-section" id="story">
             <div class="container section-header">
                 <p class="section-tag">ABOUT</p>
                 <h2 class="section-title">品牌故事</h2>
@@ -215,11 +215,12 @@
 
             <!-- 第 1 區塊，圖片左、文字右 -->
             <div class="container story-block">
-                <div class="story-image">
-                    <div class="story-image-placeholder">
-                        品牌故事圖片
-                    </div>
-                </div>
+            <div class="story-image">
+            <div
+                class="story-image-photo"
+                style="background-image: url('images/品牌故事1.jpg');"
+            ></div>
+            </div>
                 <div class="story-text">
                     <h3>【一葉初心，一杯本味】</h3>
                     <p>
@@ -233,11 +234,12 @@
 
             <!-- 第 2 區塊，圖片右、文字左 -->
             <div class="container story-block story-block-reverse">
-                <div class="story-image">
-                    <div class="story-image-placeholder">
-                        品牌故事圖片
-                    </div>
-                </div>
+            <div class="story-image">
+            <div
+                class="story-image-photo"
+                style="background-image: url('images/品牌故事2.png');"
+            ></div>
+            </div>
                 <div class="story-text">
                     <h3>品牌主旨</h3>
                     <p>
@@ -299,31 +301,40 @@
             <div class="container team-grid">
                 <!-- 成員1 -->
                 <article class="team-card">
-                    <div class="team-photo team-photo-placeholder"></div>
-                    <div class="team-name">鄧宇珊<div>
-                    <div class="team-role">職務 / 分工</div>
+                    <div
+                        class="team-photo"
+                        style="background-image: url('images/鄧宇珊照片.jpg');"
+                    ></div>
+                    <div class="team-name">鄧宇珊</div>
+                    <div class="team-role">架構設計/廣告設計</div>
                     <p class="team-bio">
-                        這裡可以寫自己的自我介紹，例如負責啥之類的
+                        每一個設計都需要不斷修改與調整，還要兼顧整體網站風格的一致性；但在每一次討論中我們都能很有共識地合作，分工明確、互相補位，讓整體設計流程更順利，也更能完整地完成作品。
                     </p>
                 </article>
 
                 <!-- 成員2 -->
                 <article class="team-card">
-                    <div class="team-photo team-photo-placeholder"></div>
+                    <div
+                        class="team-photo"
+                        style="background-image: url('images/曾雅婷照片.jpg');"
+                    ></div>
                     <div class="team-name">曾雅婷</div>
-                    <div class="team-role">職務 / 分工</div>
+                    <div class="team-role">架構設計/產品設計</div>
                     <p class="team-bio">
-                        這裡可以寫自己的自我介紹，例如負責啥之類的
+                        對我來說最困難的部分是要如何把想像呈現出來，但在每一次的討論中我們都能很有共識的合作，也讓設計變得很有成就感。
                     </p>
                 </article>
 
                 <!-- 成員3 -->
                 <article class="team-card">
-                    <div class="team-photo team-photo-placeholder"></div>
+                    <div
+                        class="team-photo"
+                        style="background-image: url('images/謝佳璇照片.jpg');"
+                    ></div>
                     <div class="team-name">謝佳璇</div>
-                    <div class="team-role">職務 / 分工</div>
+                    <div class="team-role">創始故事/品牌理念/品牌主旨/購物流程圖</div>
                     <p class="team-bio">
-                        這裡可以寫自己的自我介紹，例如負責啥之類的
+                        在負責創始故事與品牌理念時，我發現要把抽象想法轉成具體文字並不容易。設計購物流程圖時，也需要站在使用者角度反覆調整，這讓我更理解品牌與體驗的重要性。
                     </p>
                 </article>
 
@@ -331,9 +342,9 @@
                 <article class="team-card">
                     <div class="team-photo team-photo-placeholder"></div>
                     <div class="team-name">張碩恩</div>
-                    <div class="team-role">職務 / 分工</div>
+                    <div class="team-role">前端互動/功能整合/介面調校</div>
                     <p class="team-bio">
-                        這裡可以寫自己的自我介紹，例如負責啥之類的
+                        我負責把頁面做出，像購物車彈窗、點餐流程與各頁狀態的串接，過程最花時間除了寫功能，還有把細節用的順，點下去要有回應、資訊清楚、動線自然，讓使用者不需要想太多就能完成下單。
                     </p>
                 </article>
             </div>
@@ -383,10 +394,16 @@
     </button>
 
     <!-- 懸浮購物車 -->
-    <a href="cart.html" class="fab cart-floating" aria-label="購物車">
-        🛒
-        <span class="cart-count-badge" id="cartCount">0</span>
-    </a>
+    <button
+    type="button"
+    id="cartBtn"
+    class="fab cart-floating"
+    aria-label="購物車"
+    >
+    🛒
+    <span class="cart-count-badge" id="cartCount">0</span>
+    </button>
+
 
     <!-- 頁尾 -->
     <footer class="site-footer">
