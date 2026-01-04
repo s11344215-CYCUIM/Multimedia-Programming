@@ -340,7 +340,10 @@
 
                 <!-- 成員4 -->
                 <article class="team-card">
-                    <div class="team-photo team-photo-placeholder"></div>
+                    <div
+                        class="team-photo"
+                        style="background-image: url('images/張碩恩照片.jpg');"
+                    ></div>
                     <div class="team-name">張碩恩</div>
                     <div class="team-role">前端互動/功能整合/介面調校</div>
                     <p class="team-bio">
@@ -393,16 +396,31 @@
         ↑
     </button>
 
-    <!-- 懸浮購物車 -->
-    <button
-    type="button"
-    id="cartBtn"
-    class="fab cart-floating"
-    aria-label="購物車"
+    <!-- 首頁彈窗廣告 -->
+    <div
+    class="promo-modal-backdrop"
+    id="promoModal"
+    aria-hidden="true"
     >
-    🛒
-    <span class="cart-count-badge" id="cartCount">0</span>
-    </button>
+    <div class="promo-modal">
+        <button
+        type="button"
+        class="promo-modal-close"
+        id="promoModalClose"
+        aria-label="關閉廣告"
+        >
+        ×
+        </button>
+
+        <a href="merch.html" class="promo-modal-link">
+        <img
+            src="images/彈窗廣告.jpg"
+            alt="周邊商品廣告"
+            class="promo-modal-image"
+        />
+        </a>
+    </div>
+    </div>
 
 
     <!-- 頁尾 -->

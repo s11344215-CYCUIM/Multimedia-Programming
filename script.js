@@ -1552,3 +1552,33 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+// ===========================
+// 首頁彈窗廣告
+// ===========================
+document.addEventListener("DOMContentLoaded", () => {
+  const promoModal = document.getElementById("promoModal");
+  const promoClose = document.getElementById("promoModalClose");
+
+  // 只在首頁執行
+  if (!promoModal) return;
+
+  setTimeout(() => {
+    promoModal.classList.add("show");
+    document.body.classList.add("modal-open");
+  }, 600);
+
+  const closePromo = () => {
+    promoModal.classList.remove("show");
+    document.body.classList.remove("modal-open");
+  };
+
+  promoClose.addEventListener("click", closePromo);
+
+  // 點背景關閉
+  promoModal.addEventListener("click", (e) => {
+    if (e.target === promoModal) {
+      closePromo();
+    }
+  });
+});

@@ -2521,3 +2521,62 @@ body.modal-open .rating-modal-backdrop {
   overflow: hidden;
   border-radius: 20px;
 }
+
+/* ===========================
+   首頁彈窗廣告
+=========================== */
+
+.promo-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 90; /* 比購物車、order modal 再高一點 */
+  padding: 1.25rem;
+}
+
+.promo-modal-backdrop.show {
+  display: flex;
+}
+
+.promo-modal {
+  position: relative;
+  max-width: 520px;
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.35);
+  background: #000;
+}
+
+.promo-modal-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* 關閉按鈕 */
+.promo-modal-close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.8rem;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 1.4rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.promo-modal-close:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.promo-modal-link {
+  display: block;
+}
