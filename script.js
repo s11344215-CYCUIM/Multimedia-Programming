@@ -723,7 +723,6 @@ if (wheel && wheelCards.length) {
     card.addEventListener("click", () => {
       if (i === activeIndex) return;
 
-      // 用 requestAnimationFrame 讓更新更穩
       activeIndex = i;
       requestAnimationFrame(renderWheel);
     });
@@ -979,7 +978,7 @@ if (memberTabButtons.length) {
 // 若在 member.html，初始化狀態
 updateMemberStatusUI();
 
-// 會員中心：右側訂單 tab（純前端示意）
+// 會員中心：右側訂單 tab
 const orderTabs = document.querySelectorAll(".order-tab");
 if (orderTabs.length) {
   const emptyTitle = document.querySelector(".order-empty-title");
@@ -1015,22 +1014,15 @@ if (memberEditBtn) {
 }
 
 // ===========================
-// 飲品評分（只有前端） – 彈窗版
+// 飲品評分（只有前端）
 // ===========================
 const RATINGS_KEY = "site_ratings";
-
 // ===========================
-// 預設假評價（第一次進菜單頁就會自動塞進 localStorage）
-// - 只影響「平均分/評分數」
-// - 真的會員評分依然會覆蓋/新增
+// 預設假評價（第一次/或缺資料時補進 localStorage）
+// - 不覆蓋已存在的真實評分
+// - 只補「不存在的 drinkId」
 // ===========================
 function seedDefaultRatingsIfEmpty() {
-  // 已經有人評過（或你之前測試過）就不要動
-  const exists = localStorage.getItem(RATINGS_KEY);
-  if (exists) return;
-
-  // 這些 drinkId 要跟 menu.html 的 data-drink-id 對上
-  // 如果你之後新增飲品，只要在這裡補一段就好
   const defaults = {
     drink1: {
       userRatings: {
@@ -1085,22 +1077,39 @@ function seedDefaultRatingsIfEmpty() {
     },
   };
 
-  const seeded = {};
+  // 讀現有資料
+  let existing = {};
+  try {
+    const raw = localStorage.getItem(RATINGS_KEY);
+    existing = raw ? JSON.parse(raw) : {};
+    if (!existing || typeof existing !== "object") existing = {};
+  } catch (e) {
+    existing = {};
+  }
+
+  // 補齊缺的 drinkId
+  let changed = false;
   Object.entries(defaults).forEach(([drinkId, payload]) => {
+    if (existing[drinkId]) return;
+
     const ratings = payload.userRatings || {};
     const values = Object.values(ratings);
     const total = values.reduce((sum, v) => sum + (Number(v) || 0), 0);
     const count = values.length;
 
-    seeded[drinkId] = {
+    existing[drinkId] = {
       total,
       count,
       userRatings: ratings,
       userComments: payload.userComments || {},
     };
+
+    changed = true;
   });
 
-  localStorage.setItem(RATINGS_KEY, JSON.stringify(seeded));
+  if (changed) {
+    localStorage.setItem(RATINGS_KEY, JSON.stringify(existing));
+  }
 }
 
 function loadRatings() {
@@ -1149,18 +1158,15 @@ function setRatingForDrink(drinkId, userId, rating, comment) {
 
   if (typeof comment === "string") {
     const trimmed = comment.trim();
-    if (trimmed) {
-      entry.userComments[userId] = trimmed;
-    } else {
-      delete entry.userComments[userId];
-    }
+    if (trimmed) entry.userComments[userId] = trimmed;
+    else delete entry.userComments[userId];
   }
 
   ratings[drinkId] = entry;
   saveRatings(ratings);
 }
 
-// 取消某位使用者對某杯飲料的評論（星星＋文字都刪掉）
+// 取消某位使用者對某杯飲料的評論
 function deleteRatingForDrink(drinkId, userId) {
   const ratings = loadRatings();
   const entry = ratings[drinkId];
@@ -1171,15 +1177,10 @@ function deleteRatingForDrink(drinkId, userId) {
   entry.count -= 1;
 
   delete entry.userRatings[userId];
-  if (entry.userComments) {
-    delete entry.userComments[userId];
-  }
+  if (entry.userComments) delete entry.userComments[userId];
 
-  if (entry.count <= 0) {
-    delete ratings[drinkId];
-  } else {
-    ratings[drinkId] = entry;
-  }
+  if (entry.count <= 0) delete ratings[drinkId];
+  else ratings[drinkId] = entry;
 
   saveRatings(ratings);
 }
@@ -1189,12 +1190,7 @@ function getRatingInfo(drinkId, userId) {
   const entry = ratings[drinkId];
 
   if (!entry) {
-    return {
-      avg: 0,
-      count: 0,
-      userRating: null,
-      comment: "",
-    };
+    return { avg: 0, count: 0, userRating: null, comment: "" };
   }
 
   const avg = entry.count ? entry.total / entry.count : 0;
@@ -1230,15 +1226,10 @@ function renderRatingElement(ratingEl) {
   });
 
   if (textEl) {
-    if (count === 0) {
-      textEl.textContent = "目前尚無評分";
-    } else {
+    if (count === 0) textEl.textContent = "目前尚無評分";
+    else {
       const base = `平均 ${avg.toFixed(1)} ★（${count} 筆評分）`;
-      if (userRating) {
-        textEl.textContent = `${base}，你給了 ${userRating}★`;
-      } else {
-        textEl.textContent = base;
-      }
+      textEl.textContent = userRating ? `${base}，你給了 ${userRating}★` : base;
     }
   }
 
@@ -1252,6 +1243,83 @@ function renderRatingElement(ratingEl) {
       myCommentEl.textContent = "";
     }
   }
+}
+
+// 大家的評論
+// 顯示「所有有評分的人」，沒文字就顯示提示
+function escapeHtml(s) {
+  return String(s ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function renderAllComments(drinkId, currentUserEmail) {
+  const ratings = loadRatings();
+  const entry = ratings[drinkId];
+
+  const listEl = document.getElementById("ratingModalCommentsList");
+  const countEl = document.getElementById("ratingModalCommentsCount");
+  if (!listEl || !countEl) return;
+
+  const userRatings = entry?.userRatings || {};
+  const userComments = entry?.userComments || {};
+
+  // 只要有評分或有留言，就列入
+  const emails = Array.from(
+    new Set([...Object.keys(userRatings), ...Object.keys(userComments)])
+  );
+
+  const items = emails.map((email) => ({
+    email,
+    rating: Number(userRatings[email] || 0),
+    comment: (userComments[email] || "").trim(),
+  }));
+
+  // 自己置頂 → 有文字置前 → 星等高到低
+  items.sort((a, b) => {
+    const aMe = a.email === currentUserEmail ? 1 : 0;
+    const bMe = b.email === currentUserEmail ? 1 : 0;
+    if (aMe !== bMe) return bMe - aMe;
+
+    const aHas = a.comment ? 1 : 0;
+    const bHas = b.comment ? 1 : 0;
+    if (aHas !== bHas) return bHas - aHas;
+
+    return b.rating - a.rating;
+  });
+
+  countEl.textContent = String(items.length);
+
+  if (!items.length) {
+    listEl.innerHTML =
+      `<div class="rating-comment-empty">目前還沒有任何評論。</div>`;
+    return;
+  }
+
+  listEl.innerHTML = items
+    .map((it) => {
+      const isMe = it.email === currentUserEmail;
+      const who = isMe ? "你" : escapeHtml(it.email);
+      const stars =
+        "★".repeat(it.rating) + "☆".repeat(Math.max(0, 5 - it.rating));
+      const comment = it.comment
+        ? escapeHtml(it.comment)
+        : "（未留下文字評論）";
+
+      return `
+        <div class="rating-comment-item ${isMe ? "is-me" : ""}">
+          <div class="rating-comment-top">
+            <span class="rating-comment-user">${who}</span>
+            <span class="rating-comment-stars">${stars}</span>
+          </div>
+          <div class="rating-comment-text">${comment}</div>
+        </div>
+      `;
+    })
+    .join("");
 }
 
 // ===== 評分彈窗 DOM 變數與狀態 =====
@@ -1277,13 +1345,14 @@ function resetRatingModalUI() {
     });
   }
 
-  if (ratingModalCommentEl) {
-    ratingModalCommentEl.value = "";
-  }
+  if (ratingModalCommentEl) ratingModalCommentEl.value = "";
+  if (ratingModalStatusEl) ratingModalStatusEl.textContent = "";
 
-  if (ratingModalStatusEl) {
-    ratingModalStatusEl.textContent = "";
-  }
+  // 清空大家的評論區（避免上一杯殘留）
+  const listEl = document.getElementById("ratingModalCommentsList");
+  const countEl = document.getElementById("ratingModalCommentsCount");
+  if (listEl) listEl.innerHTML = "";
+  if (countEl) countEl.textContent = "0";
 }
 
 function closeRatingModal() {
@@ -1334,22 +1403,23 @@ function openRatingModalForBlock(block, drinkId) {
     });
   }
 
-  if (ratingModalCommentEl) {
-    ratingModalCommentEl.value = info.comment || "";
-  }
+  if (ratingModalCommentEl) ratingModalCommentEl.value = info.comment || "";
 
   if (ratingModalStatusEl) {
     if (info.userRating) {
-      ratingModalStatusEl.textContent = `你之前給了 ${info.userRating}★，可以在這裡修改或刪除。`;
+      ratingModalStatusEl.textContent =
+        `你之前給了 ${info.userRating}★，可以在這裡修改或刪除。`;
     } else if (info.count) {
-      ratingModalStatusEl.textContent = `目前平均 ${info.avg.toFixed(
-        1
-      )}★，共有 ${info.count} 筆評分。`;
+      ratingModalStatusEl.textContent =
+        `目前平均 ${info.avg.toFixed(1)}★，共有 ${info.count} 筆評分。`;
     } else {
       ratingModalStatusEl.textContent =
         "還沒有任何評分，成為第一個分享心得的人吧。";
     }
   }
+
+  // 顯示大家的評論
+  renderAllComments(drinkId, currentUser.email);
 
   ratingModalBackdrop.classList.add("show");
   document.body.classList.add("modal-open");
@@ -1357,17 +1427,13 @@ function openRatingModalForBlock(block, drinkId) {
 
 // 關閉彈窗（按 X）
 if (ratingModalCloseBtn) {
-  ratingModalCloseBtn.addEventListener("click", () => {
-    closeRatingModal();
-  });
+  ratingModalCloseBtn.addEventListener("click", () => closeRatingModal());
 }
 
-// 點遮罩關閉（不會刪除原本已經存好的評論）
+// 點遮罩關閉
 if (ratingModalBackdrop) {
   ratingModalBackdrop.addEventListener("click", (e) => {
-    if (e.target === ratingModalBackdrop) {
-      closeRatingModal();
-    }
+    if (e.target === ratingModalBackdrop) closeRatingModal();
   });
 }
 
@@ -1379,8 +1445,8 @@ if (ratingModalStarsEl) {
 
     const value = Number(star.dataset.star) || 0;
     if (!value) return;
-    currentRatingValue = value;
 
+    currentRatingValue = value;
     ratingModalStarsEl.querySelectorAll(".rating-star").forEach((s) => {
       const v = Number(s.dataset.star) || 0;
       s.classList.toggle("active", v <= currentRatingValue);
@@ -1413,21 +1479,19 @@ if (ratingModalSaveBtn) {
       comment
     );
 
-    if (currentRatingBlockEl) {
-      renderRatingElement(currentRatingBlockEl);
-    }
+    if (currentRatingBlockEl) renderRatingElement(currentRatingBlockEl);
 
-    if (ratingModalStatusEl) {
-      ratingModalStatusEl.textContent = "已儲存你的評分與心得。";
-    }
+    // 立刻刷新評論牆
+    renderAllComments(currentRatingDrinkId, currentUser.email);
 
-    setTimeout(() => {
-      closeRatingModal();
-    }, 600);
+    if (ratingModalStatusEl) ratingModalStatusEl.textContent = "已儲存你的評分與心得。";
+
+    // 你想保留彈窗就註解掉 close；想自動關掉就保留
+    setTimeout(() => closeRatingModal(), 600);
   });
 }
 
-// 取消這次評論（把這位使用者對這杯飲料的紀錄整個刪掉）
+// 刪除這位使用者對這杯飲料的紀錄（星星＋文字）
 if (ratingModalDeleteBtn) {
   ratingModalDeleteBtn.addEventListener("click", () => {
     const currentUser = getCurrentUser();
@@ -1441,17 +1505,17 @@ if (ratingModalDeleteBtn) {
 
     deleteRatingForDrink(currentRatingDrinkId, currentUser.email);
 
-    if (currentRatingBlockEl) {
-      renderRatingElement(currentRatingBlockEl);
-    }
+    if (currentRatingBlockEl) renderRatingElement(currentRatingBlockEl);
+
+    // 刪完也刷新評論牆
+    renderAllComments(currentRatingDrinkId, currentUser.email);
 
     closeRatingModal();
   });
 }
 
-// 初始化：讓菜單上的評分區變成「點了就跳出彈窗」
+// 初始化
 function initRatings() {
-  // 先塞預設評價（只在第一次）
   seedDefaultRatingsIfEmpty();
 
   const ratingBlocks = document.querySelectorAll(".drink-rating");
@@ -1461,21 +1525,18 @@ function initRatings() {
     const drinkId = block.dataset.drinkId;
     if (!drinkId) return;
 
-    // 一開始先根據 localStorage 把平均分 / 你的分數算出來
     renderRatingElement(block);
 
-    // 點整條評分區就打開彈窗（星星 + 文字）
     block.style.cursor = "pointer";
-    block.addEventListener("click", () => {
-      openRatingModalForBlock(block, drinkId);
-    });
+    block.addEventListener("click", () => openRatingModalForBlock(block, drinkId));
   });
 }
 
 // 在有評分區塊的頁面初始化
 initRatings();
 
-// 換頁淡出轉場（修正版：同頁 hash 不淡出）
+
+// 換頁淡出轉場
 document.addEventListener("click", (e) => {
   const a = e.target.closest("a");
   if (!a) return;
