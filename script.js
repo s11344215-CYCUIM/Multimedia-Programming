@@ -1565,12 +1565,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   setTimeout(() => {
     promoModal.classList.add("show");
-    document.body.classList.add("modal-open");
   }, 600);
 
   const closePromo = () => {
     promoModal.classList.remove("show");
-    document.body.classList.remove("modal-open");
   };
 
   promoClose.addEventListener("click", closePromo);
