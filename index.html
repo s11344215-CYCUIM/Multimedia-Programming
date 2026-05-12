@@ -7,41 +7,35 @@
     <link rel="icon" href="images/logo.png" type="image/png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+    <script src="script.js?v=20260512-3" defer></script>
 </head>
 
 <body>
     <!-- Header，上面的導覽列 -->
-    <header class="site-header">
+        <header class="site-header">
         <div class="container nav-container">
-
-            <!-- 主畫面左上Logo跟檢茶官品牌名稱 -->
             <a href="index.html#adSlider" class="logo">
                 <img src="images/logo.png" alt="檢茶官" class="logo-icon">
                 <span class="logo-text">檢茶官</span>
             </a>
 
-            <!-- 手機版選單 -->
-                        <div class="nav-menu-wrapper">
-              <button class="nav-toggle" id="navToggle" aria-label="切換選單">
-                <span class="nav-toggle-line"></span>
-                <span class="nav-toggle-line"></span>
-                <span class="nav-toggle-line"></span>
-            </button>
+            <div class="nav-menu-wrapper">
+                <button class="nav-toggle" id="navToggle" aria-label="切換選單">
+                    <span class="nav-toggle-line"></span>
+                    <span class="nav-toggle-line"></span>
+                    <span class="nav-toggle-line"></span>
+                </button>
 
-
-            <!-- 導覽列的項目-->
-            
-              <nav class="main-nav" id="mainNav">
-                <a href="#adSlider">首頁</a>
-                <a href="#limited">季節品項</a>
-                <a href="#story">品牌故事</a>
-                <a href="#craftsmen">匠心職人</a>
-                <a href="menu.html">飲品菜單</a>
-                <a href="merch.html">周邊商品</a>
-                <a href="#about">關於我們</a>
-                <a href="member.html">會員專區</a>
-            </nav>
+                <nav class="main-nav" id="mainNav">
+                    <a href="#adSlider">首頁</a>
+                    <a href="#limited">季節品項</a>
+                    <a href="#story">品牌故事</a>
+                    <a href="#craftsmen">匠心職人</a>
+                    <a href="menu.jsp">飲品菜單</a>
+                    <a href="merch.html">周邊商品</a>
+                    <a href="#about">關於我們</a>
+                    <a href="member.jsp">會員專區</a>
+                </nav>
             </div>
         </div>
     </header>
@@ -59,7 +53,7 @@
             <div class="ad-slides">
 
                 <!-- 第1則廣告 -->
-                <article class="ad-slide active" data-link="menu.html">
+                <article class="ad-slide active" data-link="menu.jsp">
                     <!--  
                     <div class="ad-tag">最新活動</div>
                     <h3 class="ad-title">最新活動的標題</h3>
@@ -71,7 +65,7 @@
                 </article>
 
                 <!-- 第2則廣告 -->
-                <article class="ad-slide" data-link="menu.html">
+                <article class="ad-slide" data-link="menu.jsp">
                     <!--
                     <div class="ad-tag">人氣推薦</div>
                     <h3 class="ad-title">人氣推薦的飲料</h3>
@@ -83,7 +77,7 @@
                 </article>
 
                 <!-- 第3則廣告 -->
-                <article class="ad-slide" data-link="menu.html">
+                <article class="ad-slide" data-link="menu.jsp">
                     <!--
                     <div class="ad-tag">會員福利</div>
                     <h3 class="ad-title">會員福利的標題</h3>
@@ -95,7 +89,7 @@
                 </article>
 
                 <!-- 第4則廣告 -->
-                <article class="ad-slide" data-link="member.html">
+                <article class="ad-slide" data-link="member.jsp">
                     <!--
                     <div class="ad-tag">想不到了</div>
                     <h3 class="ad-title">想不到了</h3>
@@ -194,7 +188,7 @@
                     </ul>
 
                     <!-- 立即訂購 -->
-                    <a href="menu.html" class="btn primary-btn">
+                    <a href="menu.jsp" class="btn primary-btn">
                         立即訂購
                     </a>
 

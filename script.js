@@ -246,11 +246,12 @@ function resetOrderModalFields() {
   if (noteEl) noteEl.value = "";
 }
 
-function openOrderModal(drinkId, drinkName, drinkPrice) {
+function openOrderModal(drinkId, drinkName, drinkPrice, productId) {
   if (!orderModalBackdrop || !modalDrinkCard) return;
 
   // 設定 data-* 給加入購物車用
   modalDrinkCard.dataset.id = drinkId || "";
+  modalDrinkCard.dataset.productId = productId || "";
   modalDrinkCard.dataset.name = drinkName || "";
   modalDrinkCard.dataset.price = String(drinkPrice || 60);
 
@@ -293,10 +294,11 @@ if (menuAddButtons.length && orderModalBackdrop) {
   menuAddButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const drinkId = btn.dataset.drinkId || "";
+      const productId = btn.dataset.productId || "";
       const drinkName = btn.dataset.drinkName || "飲料";
       const drinkPrice = Number(btn.dataset.drinkPrice) || 60;
 
-      openOrderModal(drinkId, drinkName, drinkPrice);
+      openOrderModal(drinkId, drinkName, drinkPrice, productId);
     });
   });
 }
@@ -316,6 +318,10 @@ if (addToCartButtons.length) {
       if (!card) return;
 
       const id = card.dataset.id;
+      const productId =
+        Number(card.dataset.productId) ||
+        Number(String(id || "").replace("drink", "")) ||
+        null;
       const name = card.dataset.name;
       let price = Number(card.dataset.price) || 0;
 
@@ -358,6 +364,7 @@ if (addToCartButtons.length) {
 
       const newItem = {
         id,
+        productId,
         name,
         price,
         size,
@@ -504,7 +511,7 @@ function ensureCartModalExists() {
       <div class="cart-modal-card">
         <button type="button" class="cart-modal-close" id="cartModalClose" aria-label="關閉">×</button>
         <h3 class="cart-modal-title">購物車</h3>
-        <div id="cartModalEmpty" class="cart-modal-empty" style="display:none">購物車目前是空的，<a href="menu.html">先去逛逛飲料</a>吧。</div>
+        <div id="cartModalEmpty" class="cart-modal-empty" style="display:none">購物車目前是空的，<a href="menu.jsp">先去逛逛飲料</a>吧。</div>
         <div id="cartModalList" class="cart-modal-list"></div>
         <div id="cartModalSummary" class="cart-modal-summary" style="display:none">
           <div class="cart-modal-summary-row">
@@ -512,7 +519,7 @@ function ensureCartModalExists() {
             <span id="cartModalSubtotal">$0</span>
           </div>
           <div class="cart-modal-actions">
-            <a href="checkout.html" class="btn primary-btn" id="cartModalCheckout">前往結帳</a>
+            <a href="checkout.jsp" class="btn primary-btn" id="cartModalCheckout">前往結帳</a>
             <button type="button" class="btn secondary-btn" id="cartModalCloseBtn">繼續逛</button>
           </div>
         </div>
@@ -796,8 +803,56 @@ if (checkoutContentEl) {
   renderCheckoutPage();
 }
 
+function appendCheckoutHiddenField(form, name, value) {
+  const input = document.createElement("input");
+  input.type = "hidden";
+  input.name = name;
+  input.value = value == null ? "" : String(value);
+  input.className = "checkout-backend-field";
+  form.appendChild(input);
+}
+
+function syncCheckoutBackendFields(form) {
+  form
+    .querySelectorAll(".checkout-backend-field")
+    .forEach((field) => field.remove());
+
+  const cart = loadCart();
+  appendCheckoutHiddenField(form, "item_count", cart.length);
+
+  cart.forEach((item) => {
+    const productId =
+      Number(item.productId) ||
+      Number(String(item.id || "").replace("drink", "")) ||
+      "";
+
+    appendCheckoutHiddenField(form, "product_id", productId);
+    appendCheckoutHiddenField(form, "quantity", item.quantity || 1);
+    appendCheckoutHiddenField(form, "size_name", item.size || "");
+    appendCheckoutHiddenField(form, "sugar_level", item.sugar || "");
+    appendCheckoutHiddenField(form, "ice_level", item.ice || "");
+    appendCheckoutHiddenField(
+      form,
+      "toppings",
+      Array.isArray(item.toppings) ? item.toppings.join(",") : ""
+    );
+    appendCheckoutHiddenField(form, "item_note", item.note || "");
+  });
+
+  return cart;
+}
+
 if (checkoutFormEl) {
   checkoutFormEl.addEventListener("submit", (e) => {
+    if (checkoutFormEl.dataset.backendCheckout === "true") {
+      const cart = syncCheckoutBackendFields(checkoutFormEl);
+      if (!cart.length) {
+        e.preventDefault();
+        alert("購物車目前是空的，請先加入商品。");
+      }
+      return;
+    }
+
     e.preventDefault();
 
     alert("已完成下單，但這只是示意，所以不會真的送出訂單或儲存資料");
@@ -810,153 +865,11 @@ if (checkoutFormEl) {
 }
 
 // ===========================
-// 會員系統（只有前端）
+// 會員狀態由 JSP Session 注入，不再使用 localStorage 記憶會員帳號
 // ===========================
-const USERS_KEY = "site_users";
-const CURRENT_USER_KEY = "site_current_user";
-
-function loadUsers() {
-  try {
-    const raw = localStorage.getItem(USERS_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (e) {
-    return [];
-  }
-}
-
-function saveUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-
 function getCurrentUser() {
-  try {
-    const raw = localStorage.getItem(CURRENT_USER_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch (e) {
-    return null;
-  }
+  return window.CURRENT_USER || null;
 }
-
-function setCurrentUser(user) {
-  if (!user) {
-    localStorage.removeItem(CURRENT_USER_KEY);
-  } else {
-    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-  }
-}
-
-// 會員頁 UI 更新
-function updateMemberStatusUI() {
-  const statusEl = document.getElementById("memberStatus");
-  if (!statusEl) return; // 不在 member.html 就跳出
-
-  const authSection = document.getElementById("memberAuth");
-  const dashboardSection = document.getElementById("memberDashboard");
-  const nameEl = document.getElementById("memberUsername");
-  const logoutBtn = document.getElementById("logoutBtn");
-
-  const user = getCurrentUser();
-
-  if (user) {
-    // 會員已登入：顯示會員中心，收起登入/註冊
-    if (authSection) authSection.style.display = "none";
-    if (dashboardSection) dashboardSection.style.display = "block";
-    if (nameEl) nameEl.textContent = user.name || "會員";
-
-    // 會員中心的登出按鈕
-    if (logoutBtn) logoutBtn.style.display = "inline-flex";
-
-    statusEl.innerHTML = `
-      <p>嗨，<strong>${user.name}</strong>，歡迎回來。</p>
-      <p class="member-status-sub">你可以在菜單頁幫飲品評分</p>
-    `;
-  } else {
-    // 尚未登入：顯示登入/註冊，收起會員中心
-    if (authSection) authSection.style.display = "block";
-    if (dashboardSection) dashboardSection.style.display = "none";
-    if (logoutBtn) logoutBtn.style.display = "none";
-
-    statusEl.innerHTML = `
-      <p>目前尚未登入。</p>
-      <p class="member-status-sub">註冊的資料只會保存在你的瀏覽器裡，不會傳到任何伺服器</p>
-    `;
-  }
-}
-
-// 綁定註冊表單
-const registerFormEl = document.getElementById("registerForm");
-if (registerFormEl) {
-  registerFormEl.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const name = document.getElementById("register-name").value.trim();
-    const email = document
-      .getElementById("register-email")
-      .value.trim()
-      .toLowerCase();
-    const password = document.getElementById("register-password").value;
-
-    if (!name || !email || !password) {
-      alert("請填寫註冊資料");
-      return;
-    }
-
-    const users = loadUsers();
-    const exists = users.find((u) => u.email === email);
-    if (exists) {
-      alert("這個 Email 已經註冊過了，請改用其他帳號登入");
-      return;
-    }
-
-    const newUser = { name, email, password };
-    users.push(newUser);
-    saveUsers(users);
-    setCurrentUser({ name, email });
-
-    alert("註冊完成，已自動登入。");
-    updateMemberStatusUI();
-  });
-}
-
-// 綁定登入表單
-const loginFormEl = document.getElementById("loginForm");
-if (loginFormEl) {
-  loginFormEl.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const email = document
-      .getElementById("login-email")
-      .value.trim()
-      .toLowerCase();
-    const password = document.getElementById("login-password").value;
-
-    const users = loadUsers();
-    const user = users.find(
-      (u) => u.email === email && u.password === password
-    );
-
-    if (!user) {
-      alert("帳號或密碼錯誤，或尚未註冊。");
-      return;
-    }
-
-    setCurrentUser({ name: user.name, email: user.email });
-    alert(`登入成功，歡迎回來，${user.name}。`);
-    updateMemberStatusUI();
-  });
-}
-
-// 登出
-const logoutBtnEl = document.getElementById("logoutBtn");
-if (logoutBtnEl) {
-  logoutBtnEl.addEventListener("click", () => {
-    setCurrentUser(null);
-    alert("已登出。");
-    updateMemberStatusUI();
-  });
-}
-
 // 會員頁 Tab 切換
 const memberTabButtons = document.querySelectorAll(".member-tab-btn");
 if (memberTabButtons.length) {
@@ -975,8 +888,6 @@ if (memberTabButtons.length) {
   });
 }
 
-// 若在 member.html，初始化狀態
-updateMemberStatusUI();
 
 // 會員中心：右側訂單 tab
 const orderTabs = document.querySelectorAll(".order-tab");
@@ -1018,100 +929,51 @@ if (memberEditBtn) {
 // ===========================
 const RATINGS_KEY = "site_ratings";
 // ===========================
-// 預設假評價（第一次/或缺資料時補進 localStorage）
-// - 不覆蓋已存在的真實評分
-// - 只補「不存在的 drinkId」
+// Remove legacy demo ratings while keeping non-demo user ratings.
 // ===========================
-function seedDefaultRatingsIfEmpty() {
-  const defaults = {
-    drink1: {
-      userRatings: {
-        "mika@demo.com": 5,
-        "han@demo.com": 4,
-        "yuzu@demo.com": 5,
-      },
-      userComments: {
-        "mika@demo.com": "茶香很乾淨，尾韻有回甘",
-        "han@demo.com": "不會澀，冰一點更順",
-      },
-    },
-    drink2: {
-      userRatings: {
-        "riku@demo.com": 4,
-        "noa@demo.com": 4,
-        "sena@demo.com": 5,
-        "kai@demo.com": 4,
-      },
-      userComments: {
-        "sena@demo.com": "奶香跟茶底比例超舒服。",
-      },
-    },
-    drink3: {
-      userRatings: {
-        "rina@demo.com": 5,
-        "aoi@demo.com": 5,
-        "tom@demo.com": 4,
-      },
-      userComments: {
-        "rina@demo.com": "果香酸甜剛好，奶蓋很加分。",
-      },
-    },
-    drink4: {
-      userRatings: {
-        "jay@demo.com": 4,
-        "mei@demo.com": 3,
-        "kyo@demo.com": 4,
-      },
-      userComments: {
-        "kyo@demo.com": "甜度半糖最剛好。",
-      },
-    },
-    drink5: {
-      userRatings: {
-        "zoe@demo.com": 5,
-        "liam@demo.com": 4,
-      },
-      userComments: {
-        "zoe@demo.com": "香氣很穩，熱飲也耐喝。",
-      },
-    },
-  };
-
-  // 讀現有資料
-  let existing = {};
-  try {
-    const raw = localStorage.getItem(RATINGS_KEY);
-    existing = raw ? JSON.parse(raw) : {};
-    if (!existing || typeof existing !== "object") existing = {};
-  } catch (e) {
-    existing = {};
-  }
-
-  // 補齊缺的 drinkId
+function removeDemoRatingsFromLocalStorage() {
+  const ratings = loadRatings();
   let changed = false;
-  Object.entries(defaults).forEach(([drinkId, payload]) => {
-    if (existing[drinkId]) return;
 
-    const ratings = payload.userRatings || {};
-    const values = Object.values(ratings);
-    const total = values.reduce((sum, v) => sum + (Number(v) || 0), 0);
-    const count = values.length;
+  Object.keys(ratings).forEach((drinkId) => {
+    const entry = ratings[drinkId];
+    if (!entry || typeof entry !== "object") return;
 
-    existing[drinkId] = {
-      total,
-      count,
-      userRatings: ratings,
-      userComments: payload.userComments || {},
-    };
+    if (!entry.userRatings) entry.userRatings = {};
+    if (!entry.userComments) entry.userComments = {};
 
-    changed = true;
+    Object.keys(entry.userRatings).forEach((email) => {
+      if (!email.endsWith("@demo.com")) return;
+      delete entry.userRatings[email];
+      delete entry.userComments[email];
+      changed = true;
+    });
+
+    Object.keys(entry.userComments).forEach((email) => {
+      if (!email.endsWith("@demo.com")) return;
+      delete entry.userComments[email];
+      changed = true;
+    });
+
+    const values = Object.values(entry.userRatings)
+      .map((value) => Number(value) || 0)
+      .filter((value) => value > 0);
+
+    entry.total = values.reduce((sum, value) => sum + value, 0);
+    entry.count = values.length;
+
+    if (entry.count <= 0 && !Object.keys(entry.userComments).length) {
+      delete ratings[drinkId];
+      changed = true;
+    } else {
+      ratings[drinkId] = entry;
+    }
   });
 
   if (changed) {
-    localStorage.setItem(RATINGS_KEY, JSON.stringify(existing));
+    saveRatings(ratings);
   }
 }
-
 function loadRatings() {
   try {
     const raw = localStorage.getItem(RATINGS_KEY);
@@ -1368,7 +1230,7 @@ function openRatingModalForBlock(block, drinkId) {
   const currentUser = getCurrentUser();
   if (!currentUser) {
     alert("請先登入會員，再幫飲品評分喔。");
-    window.location.href = "member.html";
+    window.location.href = "member.jsp";
     return;
   }
 
@@ -1460,7 +1322,7 @@ if (ratingModalSaveBtn) {
     const currentUser = getCurrentUser();
     if (!currentUser) {
       alert("請先登入會員，再評分。");
-      window.location.href = "member.html";
+      window.location.href = "member.jsp";
       return;
     }
 
@@ -1516,7 +1378,7 @@ if (ratingModalDeleteBtn) {
 
 // 初始化
 function initRatings() {
-  seedDefaultRatingsIfEmpty();
+  removeDemoRatingsFromLocalStorage();
 
   const ratingBlocks = document.querySelectorAll(".drink-rating");
   if (!ratingBlocks.length) return;
@@ -1564,15 +1426,8 @@ document.addEventListener("click", (e) => {
     return;
   }
 
-  if (href.startsWith("#")) return;
-
-  // 跨頁淡出
-  e.preventDefault();
-  document.body.classList.add("page-leave");
-
-  setTimeout(() => {
-    window.location.href = url.href;
-  }, 220);
+  // 跨頁連結交給瀏覽器原生跳轉，避免攔截後未導頁。
+  return;
 });
 
 // 進頁淡入
@@ -1624,9 +1479,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 只在首頁執行
   if (!promoModal) return;
 
-  setTimeout(() => {
-    promoModal.classList.add("show");
-  }, 600);
+  // 期末專題後端流程以導覽操作為主，先不自動彈出廣告，避免遮住選單連結。
 
   const closePromo = () => {
     promoModal.classList.remove("show");

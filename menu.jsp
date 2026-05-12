@@ -1,4 +1,42 @@
-<!DOCTYPE html>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.sql.*" %>
+<%@ page import="java.math.BigDecimal" %>
+<%!
+  private String escapeHtml(String value) {
+    if (value == null) return "";
+    return value
+      .replace("&", "&amp;")
+      .replace("<", "&lt;")
+      .replace(">", "&gt;")
+      .replace("\"", "&quot;")
+      .replace("'", "&#39;");
+  }
+
+  private String escapeJs(String value) {
+    if (value == null) return "";
+    return value
+      .replace("\\", "\\\\")
+      .replace("\"", "\\\"")
+      .replace("\r", "\\r")
+      .replace("\n", "\\n")
+      .replace("<", "\\u003C")
+      .replace(">", "\\u003E")
+      .replace("&", "\\u0026");
+  }
+%>
+<%
+  request.setCharacterEncoding("UTF-8");
+  String keyword = request.getParameter("keyword");
+  if (keyword == null) keyword = "";
+  keyword = keyword.trim();
+
+  final String dbUrl = "jdbc:mysql://127.0.0.1:3306/drink_shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Taipei&useSSL=false&allowPublicKeyRetrieval=true";
+  final String dbUser = "root";
+  final String dbPassword = "1234";
+  String currentUserName = (String) session.getAttribute("userName");
+  String currentUserEmail = (String) session.getAttribute("userEmail");
+  boolean loggedIn = session.getAttribute("userId") != null;
+%><!DOCTYPE html>
 <html lang="zh-Hant">
   <head>
     <meta charset="UTF-8" />
@@ -8,7 +46,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="stylesheet" href="style.css" />
-    <script src="script.js" defer></script>
+    <script>
+      window.CURRENT_USER = <%= loggedIn ? ("{name: \"" + escapeJs(currentUserName) + "\", email: \"" + escapeJs(currentUserEmail) + "\"}") : "null" %>;
+    </script>
+    <script src="script.js?v=20260512-3" defer></script>
   </head>
 
   <body>
@@ -32,10 +73,10 @@
             <a href="index.html#limited">季節新品</a>
             <a href="index.html#story">品牌故事</a>
             <a href="index.html#craftsmen">匠心職人</a>
-            <a href="menu.html">飲品菜單</a>
+            <a href="menu.jsp">飲品菜單</a>
             <a href="merch.html">周邊商品</a>
             <a href="index.html#about">關於我們</a>
-            <a href="member.html">會員專區</a>
+            <a href="member.jsp">會員專區</a>
           </nav>
         </div>
       </div>
@@ -102,215 +143,91 @@
         <section class="menu-all" id="menu-all">
           <h2 class="menu-section-title">全部飲品</h2>
 
+          <form class="member-form" method="get" action="menu.jsp" style="margin: 0 0 1.5rem;">
+            <div class="member-form-group">
+              <label for="keyword">商品搜尋</label>
+              <input
+                type="search"
+                id="keyword"
+                name="keyword"
+                value="<%= escapeHtml(keyword) %>"
+                placeholder="輸入飲品名稱或介紹關鍵字"
+              />
+            </div>
+            <button type="submit" class="btn primary-btn">搜尋</button>
+            <% if (!keyword.isEmpty()) { %>
+              <a href="menu.jsp#menu-all" class="btn secondary-btn">清除搜尋</a>
+            <% } %>
+          </form>
+
           <div class="menu-drink-list">
-            <!-- 飲料一:莓有你不行 -->
-            <div class="menu-drink-row">
-              <div class="menu-drink-image">
-                <img
-                  src="images/莓你不行.png"
-                  alt="莓有你不行"
-                  class="menu-drink-image-img"
-                />
-              </div>
-              <div class="menu-drink-text">
-                <div class="menu-drink-header">
-                  <h3>莓你不行</h3>
-                  <button
-                    class="menu-add-btn"
-                    type="button"
-                    aria-label="加入莓你不行"
-                    data-drink-id="drink1"
-                    data-drink-name="莓你不行"
-                    data-drink-price="90"
-                  >
-                    ＋
-                  </button>
-                </div>
-                <p>
-                  草莓的甜、山楂的酸、紅茶的香，加上綿密奶蓋，一杯喝得到戀愛感的酸甜滋味
-                </p>
-                <p class="menu-drink-meta">售價：$90</p>
-                <div class="drink-rating" data-drink-id="drink1">
-                  <div class="rating-stars">
-                    <span class="rating-star" data-star="1">★</span>
-                    <span class="rating-star" data-star="2">★</span>
-                    <span class="rating-star" data-star="3">★</span>
-                    <span class="rating-star" data-star="4">★</span>
-                    <span class="rating-star" data-star="5">★</span>
-                  </div>
-                  <span class="rating-text" data-rating-text>目前尚無評分</span>
-                  <p
-                    class="my-rating-comment"
-                    data-my-comment
-                    style="display: none"
-                  ></p>
-                </div>
-              </div>
-            </div>
+            <%
+              String productSql =
+                "SELECT product_id, name, description, price, stock, image_url " +
+                "FROM products " +
+                "WHERE category_id = 1 AND is_active = 1";
 
-            <!-- 飲料二:伯爵鮮奶茶 -->
-            <div class="menu-drink-row">
-              <div class="menu-drink-image">
-                <img
-                  src="images/伯爵鮮奶茶.png"
-                  alt="伯爵鮮奶茶"
-                  class="menu-drink-image-img"
-                />
-              </div>
-              <div class="menu-drink-text">
-                <div class="menu-drink-header">
-                  <h3>伯爵鮮奶茶</h3>
-                  <button
-                    class="menu-add-btn"
-                    type="button"
-                    aria-label="加入伯爵鮮奶茶"
-                    data-drink-id="drink2"
-                    data-drink-name="伯爵鮮奶茶"
-                    data-drink-price="60"
-                  >
-                    ＋
-                  </button>
-                </div>
-                <p>
-                  伯爵茶的清雅果香，融合鮮奶的柔順，一口就是經典又不膩的英式風味。
-                </p>
-                <p class="menu-drink-meta">售價：$60</p>
-                <div class="drink-rating" data-drink-id="drink2">
-                  <div class="rating-stars">
-                    <span class="rating-star" data-star="1">★</span>
-                    <span class="rating-star" data-star="2">★</span>
-                    <span class="rating-star" data-star="3">★</span>
-                    <span class="rating-star" data-star="4">★</span>
-                    <span class="rating-star" data-star="5">★</span>
-                  </div>
-                  <span class="rating-text" data-rating-text>目前尚無評分</span>
-                  <p
-                    class="my-rating-comment"
-                    data-my-comment
-                    style="display: none"
-                  ></p>
-                </div>
-              </div>
-            </div>
+              if (!keyword.isEmpty()) {
+                productSql += " AND (name COLLATE utf8mb4_unicode_ci LIKE ? OR description COLLATE utf8mb4_unicode_ci LIKE ?)";
+              }
 
-            <!-- 飲料三:焙韻厚奶 -->
-            <div class="menu-drink-row">
-              <div class="menu-drink-image">
-                <img
-                  src="images/焙韻厚奶.png"
-                  alt="焙韻厚奶"
-                  class="menu-drink-image-img"
-                />
-              </div>
-              <div class="menu-drink-text">
-                <div class="menu-drink-header">
-                  <h3>焙韻厚奶</h3>
-                  <button
-                    class="menu-add-btn"
-                    type="button"
-                    aria-label="加入焙韻厚奶"
-                    data-drink-id="drink3"
-                    data-drink-name="焙韻厚奶"
-                    data-drink-price="80"
-                  >
-                    ＋
-                  </button>
-                </div>
-                <p>
-                  深焙茶香搭上厚實奶香，濃郁順口、回韻十足，適合喜歡重口味奶茶的人。
-                </p>
-                <p class="menu-drink-meta">售價：$80 起</p>
-                <div class="drink-rating" data-drink-id="drink3">
-                  <div class="rating-stars">
-                    <span class="rating-star" data-star="1">★</span>
-                    <span class="rating-star" data-star="2">★</span>
-                    <span class="rating-star" data-star="3">★</span>
-                    <span class="rating-star" data-star="4">★</span>
-                    <span class="rating-star" data-star="5">★</span>
-                  </div>
-                  <span class="rating-text" data-rating-text>目前尚無評分</span>
-                  <p
-                    class="my-rating-comment"
-                    data-my-comment
-                    style="display: none"
-                  ></p>
-                </div>
-              </div>
-            </div>
+              productSql += " ORDER BY product_id";
 
-            <!-- 飲料四:百香QQ綠 -->
-            <div class="menu-drink-row">
-              <div class="menu-drink-image">
-                <img
-                  src="images/百香QQ綠.png"
-                  alt="百香QQ綠"
-                  class="menu-drink-image-img"
-                />
-              </div>
-              <div class="menu-drink-text">
-                <div class="menu-drink-header">
-                  <h3>百香QQ綠</h3>
-                  <button
-                    class="menu-add-btn"
-                    type="button"
-                    aria-label="加入百香QQ綠"
-                    data-drink-id="drink4"
-                    data-drink-name="百香QQ綠"
-                    data-drink-price="75"
-                  >
-                    ＋
-                  </button>
-                </div>
-                <p>
-                  百香果的酸甜遇上綠茶的清香，再加上QQ配料，清爽又有口感，一杯喝完超順口。
-                </p>
-                <p class="menu-drink-meta">售價：$75</p>
-                <div class="drink-rating" data-drink-id="drink4">
-                  <div class="rating-stars">
-                    <span class="rating-star" data-star="1">★</span>
-                    <span class="rating-star" data-star="2">★</span>
-                    <span class="rating-star" data-star="3">★</span>
-                    <span class="rating-star" data-star="4">★</span>
-                    <span class="rating-star" data-star="5">★</span>
-                  </div>
-                  <span class="rating-text" data-rating-text>目前尚無評分</span>
-                  <p
-                    class="my-rating-comment"
-                    data-my-comment
-                    style="display: none"
-                  ></p>
-                </div>
-              </div>
-            </div>
+              boolean hasProducts = false;
+              boolean queryFailed = false;
 
-            <!-- 飲料五:青韻綠茶 -->
+              try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+
+                try (
+                  Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+                  PreparedStatement stmt = conn.prepareStatement(productSql)
+                ) {
+                  if (!keyword.isEmpty()) {
+                    String likeKeyword = "%" + keyword + "%";
+                    stmt.setString(1, likeKeyword);
+                    stmt.setString(2, likeKeyword);
+                  }
+
+                  try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                      hasProducts = true;
+                      int productId = rs.getInt("product_id");
+                      String drinkId = "drink" + productId;
+                      String productName = rs.getString("name");
+                      String description = rs.getString("description");
+                      String imageUrl = rs.getString("image_url");
+                      BigDecimal priceValue = rs.getBigDecimal("price");
+                      int price = priceValue == null ? 0 : priceValue.intValue();
+                      int stock = rs.getInt("stock");
+            %>
             <div class="menu-drink-row">
               <div class="menu-drink-image">
                 <img
-                  src="images/青韻綠茶.png"
-                  alt="青韻綠茶"
+                  src="<%= escapeHtml(imageUrl) %>"
+                  alt="<%= escapeHtml(productName) %>"
                   class="menu-drink-image-img"
                 />
               </div>
               <div class="menu-drink-text">
                 <div class="menu-drink-header">
-                  <h3>青韻綠茶</h3>
+                  <h3><%= escapeHtml(productName) %></h3>
                   <button
                     class="menu-add-btn"
                     type="button"
-                    aria-label="加入青韻綠茶"
-                    data-drink-id="drink5"
-                    data-drink-name="青韻綠茶"
-                    data-drink-price="50"
+                    aria-label="加入<%= escapeHtml(productName) %>"
+                    data-drink-id="<%= escapeHtml(drinkId) %>"
+                    data-product-id="<%= productId %>"
+                    data-drink-name="<%= escapeHtml(productName) %>"
+                    data-drink-price="<%= price %>"
+                    <%= stock <= 0 ? "disabled" : "" %>
                   >
                     ＋
                   </button>
                 </div>
-                <p>
-                  淡雅茶香、清爽回甘，一杯最純粹的綠茶風味，喝起來輕盈無負擔。
-                </p>
-                <p class="menu-drink-meta">售價：$50</p>
-                <div class="drink-rating" data-drink-id="drink5">
+                <p><%= escapeHtml(description) %></p>
+                <p class="menu-drink-meta">價格：$<%= price %>　庫存：<%= stock %></p>
+                <div class="drink-rating" data-drink-id="<%= escapeHtml(drinkId) %>">
                   <div class="rating-stars">
                     <span class="rating-star" data-star="1">★</span>
                     <span class="rating-star" data-star="2">★</span>
@@ -318,7 +235,7 @@
                     <span class="rating-star" data-star="4">★</span>
                     <span class="rating-star" data-star="5">★</span>
                   </div>
-                  <span class="rating-text" data-rating-text>目前尚無評分</span>
+                  <span class="rating-text" data-rating-text>尚未評分</span>
                   <p
                     class="my-rating-comment"
                     data-my-comment
@@ -327,7 +244,28 @@
                 </div>
               </div>
             </div>
-          </div>
+            <%
+                    }
+                  }
+                }
+              } catch (Exception ex) {
+                queryFailed = true;
+            %>
+            <div class="cart-empty-message">
+              商品資料讀取失敗，請確認 MySQL95 已啟動，且 Tomcat 已安裝 MySQL Connector/J。<br />
+              <%= escapeHtml(ex.getMessage()) %>
+            </div>
+            <%
+              }
+
+              if (!queryFailed && !hasProducts) {
+            %>
+            <div class="cart-empty-message">
+              沒有找到符合條件的商品。
+            </div>
+            <%
+              }
+            %>          </div>
         </section>
       </div>
     </main>
