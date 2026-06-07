@@ -266,6 +266,19 @@
             <%
               }
             %>          </div>
+
+          <section class="product-comments-board" id="productCommentsBoard" aria-label="顧客留言">
+            <div class="product-comments-head">
+              <div>
+                <p class="section-tag">REVIEWS</p>
+                <h2 class="menu-section-title">顧客留言</h2>
+                <p class="product-comments-sub">選擇已購買或想看的產品，最新留言會排在最左邊。</p>
+              </div>
+              <a href="checkout.jsp" class="btn secondary-btn">查看購物車結帳</a>
+            </div>
+            <div class="product-comment-filters" id="productCommentFilters"></div>
+            <div class="product-comments-list" id="productCommentsList"></div>
+          </section>
         </section>
       </div>
     </main>

@@ -77,6 +77,7 @@ const contactForm = document.querySelector(".contact-form");
 
 if (contactForm) {
   contactForm.addEventListener("submit", (e) => {
+    if (contactForm.dataset.backendMember === "true") return;
     e.preventDefault();
     alert("目前為期末專案前端示意，表單不會真的送出喔。");
   });
@@ -941,17 +942,20 @@ function removeDemoRatingsFromLocalStorage() {
 
     if (!entry.userRatings) entry.userRatings = {};
     if (!entry.userComments) entry.userComments = {};
+    if (!entry.userCommentDates) entry.userCommentDates = {};
 
     Object.keys(entry.userRatings).forEach((email) => {
       if (!email.endsWith("@demo.com")) return;
       delete entry.userRatings[email];
       delete entry.userComments[email];
+      delete entry.userCommentDates[email];
       changed = true;
     });
 
     Object.keys(entry.userComments).forEach((email) => {
       if (!email.endsWith("@demo.com")) return;
       delete entry.userComments[email];
+      delete entry.userCommentDates[email];
       changed = true;
     });
 
@@ -999,12 +1003,14 @@ function setRatingForDrink(drinkId, userId, rating, comment) {
       count: 0,
       userRatings: {},
       userComments: {},
+      userCommentDates: {},
     };
   }
 
   const entry = ratings[drinkId];
   if (!entry.userRatings) entry.userRatings = {};
   if (!entry.userComments) entry.userComments = {};
+  if (!entry.userCommentDates) entry.userCommentDates = {};
 
   const prev = entry.userRatings[userId];
 
@@ -1020,8 +1026,13 @@ function setRatingForDrink(drinkId, userId, rating, comment) {
 
   if (typeof comment === "string") {
     const trimmed = comment.trim();
-    if (trimmed) entry.userComments[userId] = trimmed;
-    else delete entry.userComments[userId];
+    if (trimmed) {
+      entry.userComments[userId] = trimmed;
+      entry.userCommentDates[userId] = new Date().toISOString();
+    } else {
+      delete entry.userComments[userId];
+      delete entry.userCommentDates[userId];
+    }
   }
 
   ratings[drinkId] = entry;
@@ -1040,6 +1051,7 @@ function deleteRatingForDrink(drinkId, userId) {
 
   delete entry.userRatings[userId];
   if (entry.userComments) delete entry.userComments[userId];
+  if (entry.userCommentDates) delete entry.userCommentDates[userId];
 
   if (entry.count <= 0) delete ratings[drinkId];
   else ratings[drinkId] = entry;
@@ -1179,6 +1191,137 @@ function renderAllComments(drinkId, currentUserEmail) {
           </div>
           <div class="rating-comment-text">${comment}</div>
         </div>
+      `;
+    })
+    .join("");
+}
+
+let activeProductCommentFilter = "all";
+
+function getMenuProductsForComments() {
+  return Array.from(document.querySelectorAll(".menu-drink-row"))
+    .map((row) => {
+      const ratingEl = row.querySelector(".drink-rating[data-drink-id]");
+      const nameEl = row.querySelector(".menu-drink-header h3");
+      if (!ratingEl || !ratingEl.dataset.drinkId || !nameEl) return null;
+      return {
+        id: ratingEl.dataset.drinkId,
+        name: nameEl.textContent.trim(),
+      };
+    })
+    .filter(Boolean);
+}
+
+function formatCommentDate(value) {
+  if (!value) return "較早留言";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "較早留言";
+  return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
+}
+
+function renderProductCommentFilters(products) {
+  const filterEl = document.getElementById("productCommentFilters");
+  if (!filterEl) return;
+
+  const buttons = [
+    { id: "all", name: "全部留言" },
+    ...products,
+  ];
+
+  filterEl.innerHTML = buttons
+    .map(
+      (product) => `
+        <button
+          type="button"
+          class="product-comment-filter ${activeProductCommentFilter === product.id ? "active" : ""}"
+          data-comment-filter="${escapeHtml(product.id)}"
+        >
+          ${escapeHtml(product.name)}
+        </button>
+      `
+    )
+    .join("");
+
+  filterEl.querySelectorAll("[data-comment-filter]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      activeProductCommentFilter = btn.dataset.commentFilter || "all";
+      renderProductCommentsBoard();
+    });
+  });
+}
+
+function collectProductComments(products) {
+  const ratings = loadRatings();
+  const productMap = new Map(products.map((product) => [product.id, product.name]));
+  const items = [];
+
+  products.forEach((product) => {
+    const entry = ratings[product.id];
+    if (!entry) return;
+
+    const userRatings = entry.userRatings || {};
+    const userComments = entry.userComments || {};
+    const userCommentDates = entry.userCommentDates || {};
+    const emails = Array.from(
+      new Set([...Object.keys(userRatings), ...Object.keys(userComments)])
+    );
+
+    emails.forEach((email) => {
+      if (activeProductCommentFilter !== "all" && product.id !== activeProductCommentFilter) return;
+
+      items.push({
+        productId: product.id,
+        productName: productMap.get(product.id) || product.name,
+        email,
+        rating: Number(userRatings[email] || 0),
+        comment: (userComments[email] || "").trim(),
+        date: userCommentDates[email] || "",
+      });
+    });
+  });
+
+  return items.sort((a, b) => {
+    const aTime = a.date ? new Date(a.date).getTime() : 0;
+    const bTime = b.date ? new Date(b.date).getTime() : 0;
+    if (aTime !== bTime) return bTime - aTime;
+    return b.rating - a.rating;
+  });
+}
+
+function renderProductCommentsBoard() {
+  const listEl = document.getElementById("productCommentsList");
+  if (!listEl) return;
+
+  const products = getMenuProductsForComments();
+  renderProductCommentFilters(products);
+
+  const items = collectProductComments(products);
+  if (!items.length) {
+    listEl.innerHTML = `
+      <div class="product-comment-empty">
+        目前還沒有留言。登入會員後，點產品旁邊的星星就可以留下心得。
+      </div>
+    `;
+    return;
+  }
+
+  listEl.innerHTML = items
+    .map((item) => {
+      const stars = item.rating
+        ? "★".repeat(item.rating) + "☆".repeat(Math.max(0, 5 - item.rating))
+        : "尚未評分";
+      const text = item.comment || "（這位顧客只留下星等，沒有文字留言）";
+
+      return `
+        <article class="product-comment-card">
+          <div class="product-comment-card-top">
+            <span class="product-comment-product">${escapeHtml(item.productName)}</span>
+            <span class="product-comment-date">${formatCommentDate(item.date)}</span>
+          </div>
+          <div class="product-comment-stars">${stars}</div>
+          <p>${escapeHtml(text)}</p>
+          <div class="product-comment-user">${escapeHtml(item.email)}</div>
+        </article>
       `;
     })
     .join("");
@@ -1345,6 +1488,7 @@ if (ratingModalSaveBtn) {
 
     // 立刻刷新評論牆
     renderAllComments(currentRatingDrinkId, currentUser.email);
+    renderProductCommentsBoard();
 
     if (ratingModalStatusEl) ratingModalStatusEl.textContent = "已儲存你的評分與心得。";
 
@@ -1371,6 +1515,7 @@ if (ratingModalDeleteBtn) {
 
     // 刪完也刷新評論牆
     renderAllComments(currentRatingDrinkId, currentUser.email);
+    renderProductCommentsBoard();
 
     closeRatingModal();
   });
@@ -1381,7 +1526,10 @@ function initRatings() {
   removeDemoRatingsFromLocalStorage();
 
   const ratingBlocks = document.querySelectorAll(".drink-rating");
-  if (!ratingBlocks.length) return;
+  if (!ratingBlocks.length) {
+    renderProductCommentsBoard();
+    return;
+  }
 
   ratingBlocks.forEach((block) => {
     const drinkId = block.dataset.drinkId;
@@ -1392,6 +1540,8 @@ function initRatings() {
     block.style.cursor = "pointer";
     block.addEventListener("click", () => openRatingModalForBlock(block, drinkId));
   });
+
+  renderProductCommentsBoard();
 }
 
 // 在有評分區塊的頁面初始化

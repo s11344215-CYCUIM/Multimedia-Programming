@@ -94,11 +94,59 @@
               session.setAttribute("userId", keys.getInt(1));
               session.setAttribute("userName", name);
               session.setAttribute("userEmail", email);
+              session.setAttribute("userRole", "member");
             }
           }
         }
 
         message = "註冊完成，已自動登入。";
+        messageOk = true;
+      } else if ("adminRegister".equals(action)) {
+        activeAuthPanel = "adminRegisterPanel";
+        String storeName = trimParam(request, "storeName");
+        String managerName = trimParam(request, "managerName");
+        String email = trimParam(request, "email").toLowerCase();
+        String password = request.getParameter("password") == null ? "" : request.getParameter("password");
+
+        if (storeName.isEmpty() || managerName.isEmpty() || email.isEmpty() || password.isEmpty()) {
+          throw new Exception("請完整填寫管理者註冊資料。");
+        }
+        if (password.length() < 6) {
+          throw new Exception("管理者密碼至少需要 6 個字元。");
+        }
+
+        String adminName = storeName + " - " + managerName;
+        try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+          String existsSql = "SELECT user_id FROM users WHERE email = ?";
+          try (PreparedStatement existsStmt = conn.prepareStatement(existsSql)) {
+            existsStmt.setString(1, email);
+            try (ResultSet rs = existsStmt.executeQuery()) {
+              if (rs.next()) {
+                throw new Exception("這個 Email 已經註冊過，請改用管理者登入。");
+              }
+            }
+          }
+
+          String insertSql = "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'admin')";
+          try (PreparedStatement insertStmt = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
+            insertStmt.setString(1, adminName);
+            insertStmt.setString(2, email);
+            insertStmt.setString(3, password);
+            insertStmt.executeUpdate();
+
+            try (ResultSet keys = insertStmt.getGeneratedKeys()) {
+              if (!keys.next()) {
+                throw new Exception("管理者註冊失敗，請稍後再試。");
+              }
+              session.setAttribute("userId", keys.getInt(1));
+              session.setAttribute("userName", adminName);
+              session.setAttribute("userEmail", email);
+              session.setAttribute("userRole", "admin");
+            }
+          }
+        }
+
+        message = "管理者註冊完成，已進入後台。";
         messageOk = true;
       } else if ("login".equals(action)) {
         String email = trimParam(request, "email").toLowerCase();
@@ -109,7 +157,7 @@
         }
 
         try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
-          String loginSql = "SELECT user_id, name, email, password FROM users WHERE email = ?";
+          String loginSql = "SELECT user_id, name, email, password, role FROM users WHERE email = ?";
           try (PreparedStatement loginStmt = conn.prepareStatement(loginSql)) {
             loginStmt.setString(1, email);
             try (ResultSet rs = loginStmt.executeQuery()) {
@@ -119,11 +167,39 @@
               session.setAttribute("userId", rs.getInt("user_id"));
               session.setAttribute("userName", rs.getString("name"));
               session.setAttribute("userEmail", rs.getString("email"));
+              session.setAttribute("userRole", rs.getString("role"));
             }
           }
         }
 
         message = "登入成功。";
+        messageOk = true;
+      } else if ("adminLogin".equals(action)) {
+        activeAuthPanel = "adminLoginPanel";
+        String email = trimParam(request, "email").toLowerCase();
+        String password = request.getParameter("password") == null ? "" : request.getParameter("password");
+
+        if (email.isEmpty() || password.isEmpty()) {
+          throw new Exception("請輸入管理者 Email 與密碼。");
+        }
+
+        try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+          String loginSql = "SELECT user_id, name, email, password, role FROM users WHERE email = ? AND role = 'admin'";
+          try (PreparedStatement loginStmt = conn.prepareStatement(loginSql)) {
+            loginStmt.setString(1, email);
+            try (ResultSet rs = loginStmt.executeQuery()) {
+              if (!rs.next() || !password.equals(rs.getString("password"))) {
+                throw new Exception("管理者帳號或密碼錯誤。");
+              }
+              session.setAttribute("userId", rs.getInt("user_id"));
+              session.setAttribute("userName", rs.getString("name"));
+              session.setAttribute("userEmail", rs.getString("email"));
+              session.setAttribute("userRole", "admin");
+            }
+          }
+        }
+
+        message = "管理者登入成功。";
         messageOk = true;
       } else if ("updateProfile".equals(action)) {
         Integer userId = (Integer) session.getAttribute("userId");
@@ -163,6 +239,52 @@
         session.setAttribute("userName", name);
         message = "會員資料已更新。";
         messageOk = true;
+      } else if ("updateStock".equals(action)) {
+        String role = (String) session.getAttribute("userRole");
+        if (!"admin".equals(role)) {
+          throw new Exception("請先用管理者帳號登入。");
+        }
+
+        int productId = Integer.parseInt(trimParam(request, "productId"));
+        int stock = Integer.parseInt(trimParam(request, "stock"));
+        if (stock < 0) {
+          throw new Exception("庫存不能小於 0。");
+        }
+
+        try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+          String updateSql = "UPDATE products SET stock = ? WHERE product_id = ?";
+          try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+            updateStmt.setInt(1, stock);
+            updateStmt.setInt(2, productId);
+            updateStmt.executeUpdate();
+          }
+        }
+
+        message = "庫存已更新。";
+        messageOk = true;
+      } else if ("updateOrderStatus".equals(action)) {
+        String role = (String) session.getAttribute("userRole");
+        if (!"admin".equals(role)) {
+          throw new Exception("請先用管理者帳號登入。");
+        }
+
+        int orderId = Integer.parseInt(trimParam(request, "orderId"));
+        String status = trimParam(request, "status");
+        if (!"pending".equals(status) && !"making".equals(status) && !"ready".equals(status) && !"done".equals(status) && !"cancel".equals(status)) {
+          throw new Exception("訂單狀態不正確。");
+        }
+
+        try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+          String updateSql = "UPDATE orders SET status = ? WHERE order_id = ?";
+          try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+            updateStmt.setString(1, status);
+            updateStmt.setInt(2, orderId);
+            updateStmt.executeUpdate();
+          }
+        }
+
+        message = "訂單狀態已更新。";
+        messageOk = true;
       }
     } catch (Exception ex) {
       message = ex.getMessage();
@@ -173,7 +295,9 @@
   Integer currentUserId = (Integer) session.getAttribute("userId");
   String currentUserName = (String) session.getAttribute("userName");
   String currentUserEmail = (String) session.getAttribute("userEmail");
+  String currentUserRole = (String) session.getAttribute("userRole");
   boolean loggedIn = currentUserId != null;
+  boolean adminLoggedIn = loggedIn && "admin".equals(currentUserRole);
 %><!DOCTYPE html>
 <html lang="zh-Hant">
   <head>
@@ -250,6 +374,13 @@
               >
                 建立帳號
               </button>
+              <button
+                type="button"
+                class="member-tab-btn <%= "adminLoginPanel".equals(activeAuthPanel) || "adminRegisterPanel".equals(activeAuthPanel) ? "active" : "" %>"
+                data-tab-target="adminLoginPanel"
+              >
+                管理者登入
+              </button>
             </div>
 
             <section class="member-panel <%= "loginPanel".equals(activeAuthPanel) ? "active" : "" %>" id="loginPanel">
@@ -319,6 +450,186 @@
                   註冊並登入
                 </button>
               </form>
+            </section>
+
+            <section class="member-panel <%= "adminLoginPanel".equals(activeAuthPanel) || "adminRegisterPanel".equals(activeAuthPanel) ? "active" : "" %>" id="adminLoginPanel">
+              <form class="member-form" method="post" action="member.jsp" data-backend-member="true">
+                <input type="hidden" name="action" value="adminLogin" />
+                <div class="member-form-group">
+                  <label for="admin-login-email">管理者 Email</label>
+                  <input
+                    type="email"
+                    id="admin-login-email"
+                    name="email"
+                    required
+                    placeholder="請輸入管理者 Email"
+                  />
+                </div>
+                <div class="member-form-group">
+                  <label for="admin-login-password">密碼</label>
+                  <input
+                    type="password"
+                    id="admin-login-password"
+                    name="password"
+                    required
+                    placeholder="請輸入密碼"
+                  />
+                </div>
+                <button type="submit" class="btn primary-btn member-submit-btn">
+                  進入管理後台
+                </button>
+                <p class="member-status-sub">
+                  管理者帳號請到首頁「管理者註冊區」建立。
+                </p>
+              </form>
+            </section>
+          </div>
+        </section>
+        <% } else if (adminLoggedIn) { %>
+        <section
+          id="adminDashboard"
+          class="member-dashboard"
+          aria-label="管理者後台"
+        >
+          <div class="member-center">
+            <aside class="member-sidebar" aria-label="管理者選單">
+              <div class="member-profile">
+                <div class="member-avatar admin-avatar" aria-hidden="true"></div>
+                <div class="member-profile-text">
+                  <div class="member-username"><%= escapeHtml(currentUserName) %></div>
+                  <span class="member-edit">管理者帳號</span>
+                </div>
+              </div>
+
+              <nav class="member-side-nav" aria-label="管理者功能">
+                <button type="button" class="member-side-link active" data-panel="inventory">
+                  <span class="member-side-ico" aria-hidden="true">庫</span>
+                  <span>產品庫存</span>
+                </button>
+                <button type="button" class="member-side-link" data-panel="adminOrders">
+                  <span class="member-side-ico" aria-hidden="true">單</span>
+                  <span>訂單管理</span>
+                </button>
+              </nav>
+
+              <form method="post" action="member.jsp" data-backend-member="true">
+                <input type="hidden" name="action" value="logout" />
+                <button type="submit" class="btn secondary-btn member-logout-btn">
+                  登出管理者
+                </button>
+              </form>
+            </aside>
+
+            <section class="member-main" aria-label="管理者內容">
+              <section class="member-panel active" data-panel="inventory">
+                <h2>產品庫存管理</h2>
+                <p class="admin-panel-note">調整數量後按「更新庫存」，飲品頁會讀到新的庫存。</p>
+                <div class="admin-table">
+                  <div class="admin-table-row admin-table-head">
+                    <span>產品</span>
+                    <span>類別</span>
+                    <span>價格</span>
+                    <span>庫存</span>
+                    <span>操作</span>
+                  </div>
+                  <%
+                    try {
+                      Class.forName("com.mysql.cj.jdbc.Driver");
+                      try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+                        String productSql =
+                          "SELECT p.product_id, p.name, p.price, p.stock, c.name AS category_name " +
+                          "FROM products p JOIN categories c ON p.category_id = c.category_id " +
+                          "ORDER BY p.category_id, p.product_id";
+                        try (PreparedStatement productStmt = conn.prepareStatement(productSql);
+                             ResultSet rs = productStmt.executeQuery()) {
+                          while (rs.next()) {
+                  %>
+                  <form class="admin-table-row" method="post" action="member.jsp" data-backend-member="true">
+                    <input type="hidden" name="action" value="updateStock" />
+                    <input type="hidden" name="productId" value="<%= rs.getInt("product_id") %>" />
+                    <span><%= escapeHtml(rs.getString("name")) %></span>
+                    <span><%= escapeHtml(rs.getString("category_name")) %></span>
+                    <span>$<%= rs.getBigDecimal("price").intValue() %></span>
+                    <span>
+                      <input class="admin-stock-input" type="number" name="stock" min="0" value="<%= rs.getInt("stock") %>" />
+                    </span>
+                    <span>
+                      <button type="submit" class="btn secondary-btn admin-small-btn">更新庫存</button>
+                    </span>
+                  </form>
+                  <%
+                          }
+                        }
+                      }
+                    } catch (Exception ex) {
+                  %>
+                  <div class="order-empty">
+                    <p class="order-empty-title">庫存讀取失敗：<%= escapeHtml(ex.getMessage()) %></p>
+                  </div>
+                  <% } %>
+                </div>
+              </section>
+
+              <section class="member-panel" data-panel="adminOrders">
+                <h2>訂單管理</h2>
+                <p class="admin-panel-note">可以檢視最新訂單，並把狀態改成處理中、可取餐或已完成。</p>
+                <div class="admin-order-list">
+                  <%
+                    int adminOrderCount = 0;
+                    try {
+                      Class.forName("com.mysql.cj.jdbc.Driver");
+                      try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+                        String orderSql =
+                          "SELECT order_id, customer_name, phone, pickup_date, pickup_time, payment_method, total_amount, status, created_at " +
+                          "FROM orders ORDER BY created_at DESC LIMIT 30";
+                        try (PreparedStatement orderStmt = conn.prepareStatement(orderSql);
+                             ResultSet rs = orderStmt.executeQuery()) {
+                          while (rs.next()) {
+                            adminOrderCount++;
+                  %>
+                  <form class="admin-order-card" method="post" action="member.jsp" data-backend-member="true">
+                    <input type="hidden" name="action" value="updateOrderStatus" />
+                    <input type="hidden" name="orderId" value="<%= rs.getInt("order_id") %>" />
+                    <div>
+                      <h3>訂單 #<%= rs.getInt("order_id") %> - <%= escapeHtml(rs.getString("customer_name")) %></h3>
+                      <p>
+                        電話：<%= escapeHtml(rs.getString("phone")) %> /
+                        取餐：<%= rs.getDate("pickup_date") %> <%= rs.getTime("pickup_time") %> /
+                        金額：$<%= rs.getBigDecimal("total_amount").intValue() %>
+                      </p>
+                      <p>付款：<%= escapeHtml(rs.getString("payment_method")) %> / 建立：<%= rs.getTimestamp("created_at") %></p>
+                    </div>
+                    <div class="admin-order-actions">
+                      <select name="status">
+                        <option value="pending" <%= "pending".equals(rs.getString("status")) ? "selected" : "" %>>待處理</option>
+                        <option value="making" <%= "making".equals(rs.getString("status")) ? "selected" : "" %>>製作中</option>
+                        <option value="ready" <%= "ready".equals(rs.getString("status")) ? "selected" : "" %>>可取餐</option>
+                        <option value="done" <%= "done".equals(rs.getString("status")) ? "selected" : "" %>>已完成</option>
+                        <option value="cancel" <%= "cancel".equals(rs.getString("status")) ? "selected" : "" %>>已取消</option>
+                      </select>
+                      <button type="submit" class="btn primary-btn admin-small-btn">更新狀態</button>
+                    </div>
+                  </form>
+                  <%
+                          }
+                        }
+                      }
+                    } catch (Exception ex) {
+                  %>
+                  <div class="order-empty">
+                    <p class="order-empty-title">訂單讀取失敗：<%= escapeHtml(ex.getMessage()) %></p>
+                  </div>
+                  <%
+                    }
+                    if (adminOrderCount == 0) {
+                  %>
+                  <div class="order-empty">
+                    <div class="order-empty-illus" aria-hidden="true">單</div>
+                    <p class="order-empty-title">目前尚未有訂單</p>
+                  </div>
+                  <% } %>
+                </div>
+              </section>
             </section>
           </div>
         </section>

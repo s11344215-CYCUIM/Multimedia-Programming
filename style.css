@@ -1697,6 +1697,30 @@ body.page-leave {
     flex-direction: column;
     align-items: flex-start;
   }
+
+  .member-center {
+    grid-template-columns: 1fr;
+  }
+
+  .member-sidebar {
+    position: static;
+  }
+
+  .admin-table-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-table-head {
+    display: none;
+  }
+
+  .admin-order-card {
+    grid-template-columns: 1fr;
+  }
+
+  .product-comments-head {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 600px) {
@@ -2050,6 +2074,110 @@ body.modal-open .rating-modal-backdrop {
   color: #777 !important;
 }
 
+.product-comments-board {
+  margin-top: 2.4rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(20, 68, 51, 0.12);
+}
+
+.product-comments-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.product-comments-sub {
+  color: #777;
+  margin: 0.15rem 0 0;
+}
+
+.product-comment-filters {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.2rem 0 0.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.product-comment-filter {
+  flex: 0 0 auto;
+  border: 1px solid rgba(20, 68, 51, 0.18);
+  background: #fff;
+  color: #3d4b41;
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background-color var(--transition-fast),
+    color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.product-comment-filter.active,
+.product-comment-filter:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.product-comments-list {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 0.3rem 0.1rem 0.9rem;
+  scroll-snap-type: x proximity;
+}
+
+.product-comment-card {
+  flex: 0 0 min(310px, 86vw);
+  scroll-snap-align: start;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.07);
+  border: 1px solid rgba(20, 68, 51, 0.08);
+}
+
+.product-comment-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  align-items: center;
+  margin-bottom: 0.45rem;
+}
+
+.product-comment-product {
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.product-comment-date,
+.product-comment-user {
+  font-size: 0.82rem;
+  color: #888;
+}
+
+.product-comment-stars {
+  color: #f4b400;
+  margin-bottom: 0.45rem;
+}
+
+.product-comment-card p {
+  color: #4b433c;
+  line-height: 1.6;
+  margin: 0 0 0.8rem;
+}
+
+.product-comment-empty {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px dashed rgba(20, 68, 51, 0.22);
+  padding: 1.6rem;
+  color: #666;
+  text-align: center;
+}
+
 /* 周邊商品提醒僅供現場購買區塊 */
 .merch-note {
   text-align: center;
@@ -2370,6 +2498,11 @@ body.modal-open .rating-modal-backdrop {
   box-shadow: inset 0 0 0 1px rgba(var(--color-primary-rgb), 0.16);
 }
 
+.admin-avatar {
+  background: rgba(201, 143, 82, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(201, 143, 82, 0.28);
+}
+
 .member-username {
   font-weight: 800;
   color: var(--color-primary);
@@ -2496,6 +2629,82 @@ body.modal-open .rating-modal-backdrop {
   margin: 0.2rem 0 0;
   font-weight: 700;
   color: #444;
+}
+
+.admin-panel-note {
+  color: #777;
+  margin: -0.2rem 0 1rem;
+}
+
+.admin-table {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.admin-table-row {
+  display: grid;
+  grid-template-columns: 1.3fr 0.8fr 0.7fr 0.8fr 0.9fr;
+  gap: 0.7rem;
+  align-items: center;
+  background: #fbfaf7;
+  border: 1px solid rgba(20, 68, 51, 0.08);
+  border-radius: 14px;
+  padding: 0.8rem;
+}
+
+.admin-table-head {
+  background: rgba(var(--color-primary-rgb), 0.08);
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
+.admin-stock-input,
+.admin-order-actions select {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  padding: 0.55rem 0.65rem;
+  font-family: inherit;
+}
+
+.admin-small-btn {
+  width: 100%;
+  justify-content: center;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.88rem;
+}
+
+.admin-order-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.admin-order-card {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: 1rem;
+  align-items: center;
+  border-radius: 16px;
+  border: 1px solid rgba(20, 68, 51, 0.1);
+  background: #fbfaf7;
+  padding: 1rem;
+}
+
+.admin-order-card h3 {
+  color: var(--color-primary);
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.admin-order-card p {
+  margin: 0.15rem 0;
+  color: #666;
+  line-height: 1.5;
+}
+
+.admin-order-actions {
+  display: grid;
+  gap: 0.55rem;
 }
 
 /* RWD：手機改成上下 */

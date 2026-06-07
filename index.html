@@ -348,33 +348,38 @@
         </section>
 
         <!-- ===========================
-             加盟專區
+             管理者註冊區
         ============================ -->
         <section class="section" id="franchise">
             <div class="container section-header">
-                <p class="section-tag">FRANCHISE</p>
-                <h2 class="section-title">加盟專區</h2>
+                <p class="section-tag">ADMIN</p>
+                <h2 class="section-title">管理者註冊區</h2>
                 <p class="section-subtitle">
-                    Sharing What We Believe In<br>
-                    我們找的不是夥伴，是同道
+                    Store Management Account<br>
+                    註冊成功後可以登入管理產品庫存與訂單
                 </p>
             </div>
 
             <div class="container">
-                <form class="contact-form">
+                <form class="contact-form admin-register-form" method="post" action="member.jsp" data-backend-member="true">
+                    <input type="hidden" name="action" value="adminRegister">
                     <label>
-                        姓名
-                        <input type="text" name="name" placeholder="請輸入您的名字">
+                        店鋪 / 部門名稱
+                        <input type="text" name="storeName" required placeholder="例如：檢茶官中原店">
                     </label>
                     <label>
-                        Email
-                        <input type="email" name="email" placeholder="example@mail.com">
+                        管理者姓名
+                        <input type="text" name="managerName" required placeholder="請輸入負責人姓名">
                     </label>
                     <label>
-                        訊息內容
-                        <textarea name="message" rows="4" placeholder="備註/更多問題"></textarea>
+                        管理者 Email
+                        <input type="email" name="email" required placeholder="admin@example.com">
                     </label>
-                    <button type="submit" class="btn primary-btn">送出表單</button>
+                    <label>
+                        管理者密碼
+                        <input type="password" name="password" minlength="6" required placeholder="至少 6 個字元">
+                    </label>
+                    <button type="submit" class="btn primary-btn">註冊管理者帳號</button>
                 </form>
             </div>
         </section>
