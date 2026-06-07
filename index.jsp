@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
@@ -14,7 +14,7 @@
     <!-- Header，上面的導覽列 -->
         <header class="site-header">
         <div class="container nav-container">
-            <a href="index.html#adSlider" class="logo">
+            <a href="index.jsp#adSlider" class="logo">
                 <img src="images/logo.png" alt="檢茶官" class="logo-icon">
                 <span class="logo-text">檢茶官</span>
             </a>
@@ -32,7 +32,7 @@
                     <a href="#story">品牌故事</a>
                     <a href="#craftsmen">匠心職人</a>
                     <a href="menu.jsp">飲品菜單</a>
-                    <a href="merch.html">周邊商品</a>
+                    <a href="merch.jsp">周邊商品</a>
                     <a href="#about">關於我們</a>
                     <a href="member.jsp">會員專區</a>
                 </nav>
@@ -422,7 +422,7 @@
         ×
         </button>
 
-        <a href="merch.html" class="promo-modal-link">
+        <a href="merch.jsp" class="promo-modal-link">
         <img
             src="images/彈窗廣告.jpg"
             alt="周邊商品廣告"

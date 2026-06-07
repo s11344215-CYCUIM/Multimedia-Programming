@@ -1,4 +1,4 @@
-// ===========================
+﻿// ===========================
 // 漢堡選單開關（全尺寸共用）
 // - 點漢堡：切換 .open
 // - 點選單項目：收起
@@ -498,7 +498,7 @@ if (cartListEl) {
 // ===========================
 // 購物車彈窗（全站）
 // - 點右下角購物車：打開彈窗
-// - 維持 cart.html 可用作備援（JS 失效時仍能進頁面）
+// - 維持購物車按鈕可用作備援（JS 正常時會開啟彈窗）
 // ===========================
 
 function ensureCartModalExists() {
@@ -610,7 +610,7 @@ function renderCartModal() {
 const cartFloatingBtn = document.querySelector(".cart-floating");
 if (cartFloatingBtn) {
   cartFloatingBtn.addEventListener("click", (e) => {
-    // 讓 cart.html 仍可用作備援，所以只有在 JS 正常跑時才阻止跳頁
+    // JS 正常跑時，阻止預設跳頁並開啟彈窗
     e.preventDefault();
     openCartModal();
   });
@@ -861,7 +861,7 @@ if (checkoutFormEl) {
     saveCart([]);
     updateCartBadge();
 
-    window.location.href = "index.html#adSlider";
+    window.location.href = "index.jsp#adSlider";
   });
 }
 

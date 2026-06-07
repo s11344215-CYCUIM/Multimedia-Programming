@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+﻿<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.sql.*" %>
 <%!
   private String escapeHtml(String value) {
@@ -101,9 +101,9 @@
         messageOk = true;
       } else if ("adminRegister".equals(action)) {
         activeAuthPanel = "adminRegisterPanel";
-        String storeName = trimParam(request, "storeName");
-        String managerName = trimParam(request, "managerName");
-        String email = trimParam(request, "email").toLowerCase();
+        String storeName = trimParam(request.getParameter("storeName"));
+        String managerName = trimParam(request.getParameter("managerName"));
+        String email = trimParam(request.getParameter("email")).toLowerCase();
         String password = request.getParameter("password") == null ? "" : request.getParameter("password");
 
         if (storeName.isEmpty() || managerName.isEmpty() || email.isEmpty() || password.isEmpty()) {
@@ -174,7 +174,7 @@
         messageOk = true;
       } else if ("adminLogin".equals(action)) {
         activeAuthPanel = "adminLoginPanel";
-        String email = trimParam(request, "email").toLowerCase();
+        String email = trimParam(request.getParameter("email")).toLowerCase();
         String password = request.getParameter("password") == null ? "" : request.getParameter("password");
 
         if (email.isEmpty() || password.isEmpty()) {
@@ -243,8 +243,8 @@
           throw new Exception("請先用管理者帳號登入。");
         }
 
-        int productId = Integer.parseInt(trimParam(request, "productId"));
-        int stock = Integer.parseInt(trimParam(request, "stock"));
+        int productId = Integer.parseInt(trimParam(request.getParameter("productId")));
+        int stock = Integer.parseInt(trimParam(request.getParameter("stock")));
         if (stock < 0) {
           throw new Exception("庫存不能小於 0。");
         }
@@ -266,8 +266,8 @@
           throw new Exception("請先用管理者帳號登入。");
         }
 
-        int orderId = Integer.parseInt(trimParam(request, "orderId"));
-        String status = trimParam(request, "status");
+        int orderId = Integer.parseInt(trimParam(request.getParameter("orderId")));
+        String status = trimParam(request.getParameter("status"));
         if (!"pending".equals(status) && !"making".equals(status) && !"ready".equals(status) && !"done".equals(status) && !"cancel".equals(status)) {
           throw new Exception("訂單狀態不正確。");
         }
@@ -314,7 +314,7 @@
   <body>
     <header class="site-header">
       <div class="container nav-container">
-        <a href="index.html#adSlider" class="logo">
+        <a href="index.jsp#adSlider" class="logo">
           <img src="images/logo.png" alt="檢茶官" class="logo-icon" />
           <span class="logo-text">檢茶官</span>
         </a>
@@ -327,13 +327,13 @@
           </button>
 
           <nav class="main-nav" id="mainNav">
-            <a href="index.html#adSlider">首頁</a>
-            <a href="index.html#limited">季節新品</a>
-            <a href="index.html#story">品牌故事</a>
-            <a href="index.html#craftsmen">匠心職人</a>
+            <a href="index.jsp#adSlider">首頁</a>
+            <a href="index.jsp#limited">季節新品</a>
+            <a href="index.jsp#story">品牌故事</a>
+            <a href="index.jsp#craftsmen">匠心職人</a>
             <a href="menu.jsp">飲品菜單</a>
-            <a href="merch.html">周邊商品</a>
-            <a href="index.html#about">關於我們</a>
+            <a href="merch.jsp">周邊商品</a>
+            <a href="index.jsp#about">關於我們</a>
             <a href="member.jsp">會員專區</a>
           </nav>
         </div>
@@ -512,7 +512,7 @@
 
               <form method="post" action="member.jsp" data-backend-member="true">
                 <input type="hidden" name="action" value="logout" />
-                <button type="submit" class="btn secondary-btn member-logout-btn">
+                <button type="submit" class="btn admin-logout-btn member-logout-btn">
                   登出管理者
                 </button>
               </form>
@@ -552,7 +552,7 @@
                       <input class="admin-stock-input" type="number" name="stock" min="0" value="<%= rs.getInt("stock") %>" />
                     </span>
                     <span>
-                      <button type="submit" class="btn secondary-btn admin-small-btn">更新庫存</button>
+                      <button type="submit" class="btn admin-action-btn admin-small-btn">更新庫存</button>
                     </span>
                   </form>
                   <%
@@ -605,7 +605,7 @@
                         <option value="done" <%= "done".equals(rs.getString("status")) ? "selected" : "" %>>已完成</option>
                         <option value="cancel" <%= "cancel".equals(rs.getString("status")) ? "selected" : "" %>>已取消</option>
                       </select>
-                      <button type="submit" class="btn primary-btn admin-small-btn">更新狀態</button>
+                      <button type="submit" class="btn admin-action-btn admin-small-btn">更新狀態</button>
                     </div>
                   </form>
                   <%

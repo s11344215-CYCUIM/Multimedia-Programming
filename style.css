@@ -2667,6 +2667,29 @@ body.modal-open .rating-modal-backdrop {
   font-family: inherit;
 }
 
+.admin-action-btn,
+.admin-logout-btn {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 10px 20px rgba(20, 68, 51, 0.16);
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.admin-action-btn:hover,
+.admin-logout-btn:hover {
+  background: #0f3427;
+  border-color: #0f3427;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.admin-logout-btn {
+  width: 100%;
+  margin-top: 1.2rem;
+}
+
 .admin-small-btn {
   width: 100%;
   justify-content: center;

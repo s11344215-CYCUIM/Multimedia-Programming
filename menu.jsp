@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+﻿<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.sql.*" %>
 <%@ page import="java.math.BigDecimal" %>
 <%!
@@ -56,7 +56,7 @@
     <header class="site-header">
       <div class="container nav-container">
         <!-- 主畫面左上Logo跟檢茶官品牌名稱 -->
-        <a href="index.html#adSlider" class="logo">
+        <a href="index.jsp#adSlider" class="logo">
           <img src="images/logo.png" alt="檢茶官" class="logo-icon" />
           <span class="logo-text">檢茶官</span>
         </a>
@@ -69,13 +69,13 @@
           </button>
 
           <nav class="main-nav" id="mainNav">
-            <a href="index.html#adSlider">首頁</a>
-            <a href="index.html#limited">季節新品</a>
-            <a href="index.html#story">品牌故事</a>
-            <a href="index.html#craftsmen">匠心職人</a>
+            <a href="index.jsp#adSlider">首頁</a>
+            <a href="index.jsp#limited">季節新品</a>
+            <a href="index.jsp#story">品牌故事</a>
+            <a href="index.jsp#craftsmen">匠心職人</a>
             <a href="menu.jsp">飲品菜單</a>
-            <a href="merch.html">周邊商品</a>
-            <a href="index.html#about">關於我們</a>
+            <a href="merch.jsp">周邊商品</a>
+            <a href="index.jsp#about">關於我們</a>
             <a href="member.jsp">會員專區</a>
           </nav>
         </div>
