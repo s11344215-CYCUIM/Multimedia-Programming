@@ -1,6 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.sql.*" %>
-<%@ page import="jakarta.servlet.http.HttpServletRequest" %>
 <%!
   private String escapeHtml(String value) {
     if (value == null) return "";
@@ -24,8 +23,7 @@
       .replace("&", "\\u0026");
   }
 
-  private String trimParam(HttpServletRequest request, String name) {
-    String value = request.getParameter(name);
+  private String trimParam(String value) {
     return value == null ? "" : value.trim();
   }
 %>
@@ -39,7 +37,7 @@
   String message = "";
   boolean messageOk = false;
   String activeAuthPanel = "loginPanel";
-  String action = trimParam(request, "action");
+  String action = trimParam(request.getParameter("action"));
 
   if ("logout".equals(action)) {
     session.invalidate();
@@ -58,8 +56,8 @@
 
       if ("register".equals(action)) {
         activeAuthPanel = "registerPanel";
-        String name = trimParam(request, "name");
-        String email = trimParam(request, "email").toLowerCase();
+        String name = trimParam(request.getParameter("name"));
+        String email = trimParam(request.getParameter("email")).toLowerCase();
         String password = request.getParameter("password") == null ? "" : request.getParameter("password");
 
         if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
@@ -149,7 +147,7 @@
         message = "管理者註冊完成，已進入後台。";
         messageOk = true;
       } else if ("login".equals(action)) {
-        String email = trimParam(request, "email").toLowerCase();
+        String email = trimParam(request.getParameter("email")).toLowerCase();
         String password = request.getParameter("password") == null ? "" : request.getParameter("password");
 
         if (email.isEmpty() || password.isEmpty()) {
@@ -207,7 +205,7 @@
           throw new Exception("請先登入。");
         }
 
-        String name = trimParam(request, "name");
+        String name = trimParam(request.getParameter("name"));
         String newPassword = request.getParameter("password") == null ? "" : request.getParameter("password");
 
         if (name.isEmpty()) {
