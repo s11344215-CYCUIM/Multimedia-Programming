@@ -26,13 +26,115 @@
   private String trimParam(String value) {
     return value == null ? "" : value.trim();
   }
+
+  private Connection openServerConnection() throws Exception {
+    Class.forName("com.mysql.cj.jdbc.Driver");
+
+    String url = "jdbc:mysql://127.0.0.1:3306/?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Taipei&useSSL=false&allowPublicKeyRetrieval=true";
+    String[] passwords = { "1234", "", "root" };
+    SQLException lastError = null;
+
+    for (String password : passwords) {
+      try {
+        return DriverManager.getConnection(url, "root", password);
+      } catch (SQLException ex) {
+        lastError = ex;
+      }
+    }
+
+    throw lastError;
+  }
+
+  private Connection openDrinkShopConnection() throws Exception {
+    try (Connection serverConn = openServerConnection();
+         Statement serverStmt = serverConn.createStatement()) {
+      serverStmt.executeUpdate(
+        "CREATE DATABASE IF NOT EXISTS drink_shop " +
+        "CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+      );
+    }
+
+    String url = "jdbc:mysql://127.0.0.1:3306/drink_shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Taipei&useSSL=false&allowPublicKeyRetrieval=true";
+    String[] passwords = { "1234", "", "root" };
+    SQLException lastError = null;
+
+    for (String password : passwords) {
+      try {
+        Connection conn = DriverManager.getConnection(url, "root", password);
+        ensureCoreTables(conn);
+        return conn;
+      } catch (SQLException ex) {
+        lastError = ex;
+      }
+    }
+
+    throw lastError;
+  }
+
+  private void ensureCoreTables(Connection conn) throws SQLException {
+    try (Statement stmt = conn.createStatement()) {
+      stmt.executeUpdate(
+        "CREATE TABLE IF NOT EXISTS users (" +
+        "user_id INT AUTO_INCREMENT PRIMARY KEY, " +
+        "name VARCHAR(100) NOT NULL, " +
+        "email VARCHAR(150) NOT NULL UNIQUE, " +
+        "password VARCHAR(255) NOT NULL, " +
+        "role VARCHAR(20) NOT NULL DEFAULT 'member', " +
+        "created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP" +
+        ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+      );
+      stmt.executeUpdate(
+        "CREATE TABLE IF NOT EXISTS categories (" +
+        "category_id INT AUTO_INCREMENT PRIMARY KEY, " +
+        "name VARCHAR(50) NOT NULL UNIQUE" +
+        ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+      );
+      stmt.executeUpdate(
+        "CREATE TABLE IF NOT EXISTS products (" +
+        "product_id INT AUTO_INCREMENT PRIMARY KEY, " +
+        "category_id INT NOT NULL, " +
+        "name VARCHAR(100) NOT NULL, " +
+        "description TEXT, " +
+        "price DECIMAL(10, 2) NOT NULL, " +
+        "stock INT NOT NULL DEFAULT 0, " +
+        "image_url VARCHAR(255), " +
+        "is_active TINYINT(1) NOT NULL DEFAULT 1, " +
+        "created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, " +
+        "CONSTRAINT fk_products_category_member FOREIGN KEY (category_id) REFERENCES categories(category_id)" +
+        ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+      );
+      stmt.executeUpdate(
+        "CREATE TABLE IF NOT EXISTS orders (" +
+        "order_id INT AUTO_INCREMENT PRIMARY KEY, " +
+        "user_id INT NULL, " +
+        "customer_name VARCHAR(100) NOT NULL, " +
+        "phone VARCHAR(30) NOT NULL, " +
+        "pickup_date DATE NOT NULL, " +
+        "pickup_time TIME NOT NULL, " +
+        "payment_method VARCHAR(30) NOT NULL, " +
+        "note TEXT, " +
+        "total_amount DECIMAL(10, 2) NOT NULL, " +
+        "status VARCHAR(30) NOT NULL DEFAULT 'pending', " +
+        "created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP" +
+        ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+      );
+      stmt.executeUpdate("INSERT IGNORE INTO categories (category_id, name) VALUES (1, '飲品'), (2, '周邊商品')");
+      stmt.executeUpdate(
+        "INSERT IGNORE INTO products (product_id, category_id, name, description, price, stock, image_url, is_active) VALUES " +
+        "(1, 1, '莓你不行', '草莓風味季節飲品。', 90.00, 100, 'images/莓你不行.png', 1), " +
+        "(2, 1, '伯爵鮮奶茶', '伯爵茶香搭配鮮奶。', 60.00, 100, 'images/伯爵鮮奶茶.png', 1), " +
+        "(3, 1, '焙韻厚奶', '焙茶香氣與厚奶口感。', 80.00, 100, 'images/焙韻厚奶.png', 1), " +
+        "(4, 1, '百香QQ綠', '百香果綠茶搭配 QQ 配料。', 75.00, 100, 'images/百香QQ綠.png', 1), " +
+        "(5, 1, '青韻綠茶', '清爽綠茶基本款。', 50.00, 100, 'images/青韻綠茶.png', 1), " +
+        "(6, 2, '環保杯', '品牌環保杯。', 799.00, 50, 'images/環保杯.png', 1), " +
+        "(7, 2, '保冰袋', '品牌保冰袋。', 179.00, 50, 'images/保冰袋.png', 1), " +
+        "(8, 2, '杯套', '品牌杯套。', 129.00, 50, 'images/杯套.png', 1)"
+      );
+    }
+  }
 %>
 <%
   request.setCharacterEncoding("UTF-8");
-
-  final String dbUrl = "jdbc:mysql://127.0.0.1:3306/drink_shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Taipei&useSSL=false&allowPublicKeyRetrieval=true";
-  final String dbUser = "root";
-  final String dbPassword = "1234";
 
   String message = "";
   boolean messageOk = false;
@@ -67,7 +169,7 @@
           throw new Exception("密碼至少需要 6 個字元。");
         }
 
-        try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+        try (Connection conn = openDrinkShopConnection()) {
           String existsSql = "SELECT user_id FROM users WHERE email = ?";
           try (PreparedStatement existsStmt = conn.prepareStatement(existsSql)) {
             existsStmt.setString(1, email);
@@ -114,7 +216,7 @@
         }
 
         String adminName = storeName + " - " + managerName;
-        try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+        try (Connection conn = openDrinkShopConnection()) {
           String existsSql = "SELECT user_id FROM users WHERE email = ?";
           try (PreparedStatement existsStmt = conn.prepareStatement(existsSql)) {
             existsStmt.setString(1, email);
@@ -154,7 +256,7 @@
           throw new Exception("請輸入 Email 與密碼。");
         }
 
-        try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+        try (Connection conn = openDrinkShopConnection()) {
           String loginSql = "SELECT user_id, name, email, password, role FROM users WHERE email = ?";
           try (PreparedStatement loginStmt = conn.prepareStatement(loginSql)) {
             loginStmt.setString(1, email);
@@ -181,7 +283,7 @@
           throw new Exception("請輸入管理者 Email 與密碼。");
         }
 
-        try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+        try (Connection conn = openDrinkShopConnection()) {
           String loginSql = "SELECT user_id, name, email, password, role FROM users WHERE email = ? AND role = 'admin'";
           try (PreparedStatement loginStmt = conn.prepareStatement(loginSql)) {
             loginStmt.setString(1, email);
@@ -215,7 +317,7 @@
           throw new Exception("新密碼至少需要 6 個字元。");
         }
 
-        try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+        try (Connection conn = openDrinkShopConnection()) {
           if (newPassword.isEmpty()) {
             String updateSql = "UPDATE users SET name = ? WHERE user_id = ?";
             try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
@@ -249,7 +351,7 @@
           throw new Exception("庫存不能小於 0。");
         }
 
-        try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+        try (Connection conn = openDrinkShopConnection()) {
           String updateSql = "UPDATE products SET stock = ? WHERE product_id = ?";
           try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
             updateStmt.setInt(1, stock);
@@ -272,7 +374,7 @@
           throw new Exception("訂單狀態不正確。");
         }
 
-        try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+        try (Connection conn = openDrinkShopConnection()) {
           String updateSql = "UPDATE orders SET status = ? WHERE order_id = ?";
           try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
             updateStmt.setString(1, status);
@@ -532,8 +634,7 @@
                   </div>
                   <%
                     try {
-                      Class.forName("com.mysql.cj.jdbc.Driver");
-                      try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+                      try (Connection conn = openDrinkShopConnection()) {
                         String productSql =
                           "SELECT p.product_id, p.name, p.price, p.stock, c.name AS category_name " +
                           "FROM products p JOIN categories c ON p.category_id = c.category_id " +
@@ -575,8 +676,7 @@
                   <%
                     int adminOrderCount = 0;
                     try {
-                      Class.forName("com.mysql.cj.jdbc.Driver");
-                      try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+                      try (Connection conn = openDrinkShopConnection()) {
                         String orderSql =
                           "SELECT order_id, customer_name, phone, pickup_date, pickup_time, payment_method, total_amount, status, created_at " +
                           "FROM orders ORDER BY created_at DESC LIMIT 30";
@@ -725,8 +825,7 @@
                   <%
                     int orderCount = 0;
                     try {
-                      Class.forName("com.mysql.cj.jdbc.Driver");
-                      try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+                      try (Connection conn = openDrinkShopConnection()) {
                         String orderSql =
                           "SELECT order_id, pickup_date, pickup_time, payment_method, total_amount, status, created_at " +
                           "FROM orders WHERE user_id = ? ORDER BY created_at DESC";

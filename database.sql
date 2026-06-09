@@ -78,6 +78,7 @@ CREATE TABLE IF NOT EXISTS comments (
     FOREIGN KEY (product_id) REFERENCES products(product_id),
   CONSTRAINT fk_comments_user
     FOREIGN KEY (user_id) REFERENCES users(user_id),
+  UNIQUE KEY uk_comments_product_user (product_id, user_id),
   INDEX idx_comments_product_date (product_id, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

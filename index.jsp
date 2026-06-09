@@ -1,4 +1,77 @@
-﻿<!DOCTYPE html>
+﻿<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.sql.*" %>
+<%!
+  private String escapeHtml(String value) {
+    if (value == null) return "";
+    return value
+      .replace("&", "&amp;")
+      .replace("<", "&lt;")
+      .replace(">", "&gt;")
+      .replace("\"", "&quot;")
+      .replace("'", "&#39;");
+  }
+%>
+<%
+    request.setCharacterEncoding("UTF-8");
+
+    final String dbServerUrl = "jdbc:mysql://127.0.0.1:3306/?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Taipei&useSSL=false&allowPublicKeyRetrieval=true";
+    final String dbUrl = "jdbc:mysql://127.0.0.1:3306/drink_shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Taipei&useSSL=false&allowPublicKeyRetrieval=true";
+    final String dbUser = "root";
+    final String dbPassword = "1234";
+
+    int totalVisitCount = 0;
+    String visitorCounterMessage = "";
+
+    try {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+
+        try (Connection serverConn = DriverManager.getConnection(dbServerUrl, dbUser, dbPassword);
+             Statement serverStmt = serverConn.createStatement()) {
+            serverStmt.executeUpdate(
+                "CREATE DATABASE IF NOT EXISTS drink_shop " +
+                "CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+            );
+        }
+
+        try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+            String createSql =
+                "CREATE TABLE IF NOT EXISTS visits (" +
+                "visit_id INT AUTO_INCREMENT PRIMARY KEY, " +
+                "visit_date DATE NOT NULL UNIQUE, " +
+                "visit_count INT NOT NULL DEFAULT 0, " +
+                "updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" +
+                ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+            try (Statement createStmt = conn.createStatement()) {
+                createStmt.executeUpdate(createSql);
+            }
+
+            String updateSql =
+                "INSERT INTO visits (visit_date, visit_count) VALUES (CURDATE(), 1) " +
+                "ON DUPLICATE KEY UPDATE visit_count = visit_count + 1";
+            try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                updateStmt.executeUpdate();
+            }
+
+            String totalSql = "SELECT COALESCE(SUM(visit_count), 0) AS total_count FROM visits";
+            try (
+                PreparedStatement totalStmt = conn.prepareStatement(totalSql);
+                ResultSet rs = totalStmt.executeQuery()
+            ) {
+                if (rs.next()) {
+                    totalVisitCount = rs.getInt("total_count");
+                }
+            }
+        }
+    } catch (Exception ex) {
+        Integer fallbackCount = (Integer) application.getAttribute("fallbackVisitCount");
+        if (fallbackCount == null) {
+            fallbackCount = 0;
+        }
+        fallbackCount = fallbackCount + 1;
+        application.setAttribute("fallbackVisitCount", fallbackCount);
+        totalVisitCount = fallbackCount;
+    }
+%><!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
@@ -381,6 +454,14 @@
                     </label>
                     <button type="submit" class="btn primary-btn">註冊管理者帳號</button>
                 </form>
+
+                <div class="visitor-counter" aria-label="訪客計數器">
+                    <% if (visitorCounterMessage.isEmpty()) { %>
+                        <span>累積訪客人次：<strong><%= totalVisitCount %></strong></span>
+                    <% } else { %>
+                        <span><%= escapeHtml(visitorCounterMessage) %></span>
+                    <% } %>
+                </div>
             </div>
         </section>
     </main>
@@ -391,9 +472,6 @@
         class="fab back-to-top"
         aria-label="回到頂部"
     ></button>
-
-        ↑
-    </button>
 
     <!-- 購物車 -->
     <button

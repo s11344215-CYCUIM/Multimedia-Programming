@@ -979,6 +979,10 @@ function removeDemoRatingsFromLocalStorage() {
   }
 }
 function loadRatings() {
+  if (window.SERVER_RATINGS && typeof window.SERVER_RATINGS === "object") {
+    return window.SERVER_RATINGS;
+  }
+
   try {
     const raw = localStorage.getItem(RATINGS_KEY);
     if (!raw) return {};
@@ -1336,8 +1340,14 @@ const ratingModalCommentEl = document.getElementById("ratingModalComment");
 const ratingModalSaveBtn = document.getElementById("ratingModalSave");
 const ratingModalDeleteBtn = document.getElementById("ratingModalDelete");
 const ratingModalStatusEl = document.getElementById("ratingModalStatus");
+const ratingServerForm = document.getElementById("ratingServerForm");
+const ratingServerAction = document.getElementById("ratingServerAction");
+const ratingServerProductId = document.getElementById("ratingServerProductId");
+const ratingServerRating = document.getElementById("ratingServerRating");
+const ratingServerContent = document.getElementById("ratingServerContent");
 
 let currentRatingDrinkId = null;
+let currentRatingProductId = null;
 let currentRatingBlockEl = null;
 let currentRatingValue = 0;
 
@@ -1365,6 +1375,7 @@ function closeRatingModal() {
   ratingModalBackdrop.classList.remove("show");
   document.body.classList.remove("modal-open");
   currentRatingDrinkId = null;
+  currentRatingProductId = null;
   currentRatingBlockEl = null;
   resetRatingModalUI();
 }
@@ -1383,6 +1394,7 @@ function openRatingModalForBlock(block, drinkId) {
   }
 
   currentRatingDrinkId = drinkId;
+  currentRatingProductId = block.dataset.productId || "";
   currentRatingBlockEl = block;
   resetRatingModalUI();
 
@@ -1428,6 +1440,22 @@ function openRatingModalForBlock(block, drinkId) {
 
   ratingModalBackdrop.classList.add("show");
   document.body.classList.add("modal-open");
+}
+
+function submitRatingToServer(action) {
+  if (!ratingServerForm || !ratingServerAction || !ratingServerProductId) return false;
+  if (!currentRatingProductId) return false;
+
+  ratingServerAction.value = action;
+  ratingServerProductId.value = currentRatingProductId;
+
+  if (ratingServerRating) ratingServerRating.value = String(currentRatingValue || "");
+  if (ratingServerContent) {
+    ratingServerContent.value = ratingModalCommentEl ? ratingModalCommentEl.value : "";
+  }
+
+  ratingServerForm.submit();
+  return true;
 }
 
 // 關閉彈窗（按 X）
@@ -1476,13 +1504,10 @@ if (ratingModalSaveBtn) {
       return;
     }
 
+    if (submitRatingToServer("saveComment")) return;
+
     const comment = ratingModalCommentEl ? ratingModalCommentEl.value : "";
-    setRatingForDrink(
-      currentRatingDrinkId,
-      currentUser.email,
-      currentRatingValue,
-      comment
-    );
+    setRatingForDrink(currentRatingDrinkId, currentUser.email, currentRatingValue, comment);
 
     if (currentRatingBlockEl) renderRatingElement(currentRatingBlockEl);
 
@@ -1508,6 +1533,8 @@ if (ratingModalDeleteBtn) {
 
     const ok = confirm("確定要刪除你對這杯飲料的評分與心得嗎？");
     if (!ok) return;
+
+    if (submitRatingToServer("deleteComment")) return;
 
     deleteRatingForDrink(currentRatingDrinkId, currentUser.email);
 

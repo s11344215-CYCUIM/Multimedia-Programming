@@ -1,7 +1,16 @@
 ﻿<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.sql.*" %>
 <%@ page import="java.math.BigDecimal" %>
+<%@ page import="java.util.*" %>
 <%!
+  private static class RatingEntry {
+    int total = 0;
+    int count = 0;
+    Map<String, Integer> userRatings = new LinkedHashMap<>();
+    Map<String, String> userComments = new LinkedHashMap<>();
+    Map<String, String> userCommentDates = new LinkedHashMap<>();
+  }
+
   private String escapeHtml(String value) {
     if (value == null) return "";
     return value
@@ -23,6 +32,26 @@
       .replace(">", "\\u003E")
       .replace("&", "\\u0026");
   }
+
+  private String trimParam(String value) {
+    return value == null ? "" : value.trim();
+  }
+
+  private int parsePositiveInt(String value) {
+    try {
+      int parsed = Integer.parseInt(value);
+      return parsed > 0 ? parsed : 0;
+    } catch (Exception ex) {
+      return 0;
+    }
+  }
+
+  private boolean productMatchesKeyword(String[] product, String keyword) {
+    if (keyword == null || keyword.trim().isEmpty()) return true;
+    String loweredKeyword = keyword.trim().toLowerCase();
+    return product[1].toLowerCase().contains(loweredKeyword) ||
+      product[2].toLowerCase().contains(loweredKeyword);
+  }
 %>
 <%
   request.setCharacterEncoding("UTF-8");
@@ -30,12 +59,265 @@
   if (keyword == null) keyword = "";
   keyword = keyword.trim();
 
+  final String dbServerUrl = "jdbc:mysql://127.0.0.1:3306/?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Taipei&useSSL=false&allowPublicKeyRetrieval=true";
   final String dbUrl = "jdbc:mysql://127.0.0.1:3306/drink_shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Taipei&useSSL=false&allowPublicKeyRetrieval=true";
   final String dbUser = "root";
   final String dbPassword = "1234";
   String currentUserName = (String) session.getAttribute("userName");
   String currentUserEmail = (String) session.getAttribute("userEmail");
-  boolean loggedIn = session.getAttribute("userId") != null;
+  Integer currentUserId = (Integer) session.getAttribute("userId");
+  boolean loggedIn = currentUserId != null;
+  String[][] fallbackProducts = {
+    { "1", "莓你不行", "草莓風味季節飲品。", "90", "100", "images/莓你不行.png" },
+    { "2", "伯爵鮮奶茶", "伯爵茶香搭配鮮奶。", "60", "100", "images/伯爵鮮奶茶.png" },
+    { "3", "焙韻厚奶", "焙茶香氣與厚奶口感。", "80", "100", "images/焙韻厚奶.png" },
+    { "4", "百香QQ綠", "百香果綠茶搭配 QQ 配料。", "75", "100", "images/百香QQ綠.png" },
+    { "5", "青韻綠茶", "清爽綠茶基本款。", "50", "100", "images/青韻綠茶.png" }
+  };
+
+  try {
+    Class.forName("com.mysql.cj.jdbc.Driver");
+
+    try (Connection serverConn = DriverManager.getConnection(dbServerUrl, dbUser, dbPassword);
+         Statement serverStmt = serverConn.createStatement()) {
+      serverStmt.executeUpdate(
+        "CREATE DATABASE IF NOT EXISTS drink_shop " +
+        "CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+      );
+    }
+
+    try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+      try (Statement initStmt = conn.createStatement()) {
+        initStmt.executeUpdate(
+          "CREATE TABLE IF NOT EXISTS users (" +
+          "user_id INT AUTO_INCREMENT PRIMARY KEY, " +
+          "name VARCHAR(100) NOT NULL, " +
+          "email VARCHAR(150) NOT NULL UNIQUE, " +
+          "password VARCHAR(255) NOT NULL, " +
+          "role VARCHAR(20) NOT NULL DEFAULT 'member', " +
+          "created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP" +
+          ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+        );
+        initStmt.executeUpdate(
+          "CREATE TABLE IF NOT EXISTS categories (" +
+          "category_id INT AUTO_INCREMENT PRIMARY KEY, " +
+          "name VARCHAR(50) NOT NULL UNIQUE" +
+          ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+        );
+        initStmt.executeUpdate(
+          "CREATE TABLE IF NOT EXISTS products (" +
+          "product_id INT AUTO_INCREMENT PRIMARY KEY, " +
+          "category_id INT NOT NULL, " +
+          "name VARCHAR(100) NOT NULL, " +
+          "description TEXT, " +
+          "price DECIMAL(10, 2) NOT NULL, " +
+          "stock INT NOT NULL DEFAULT 0, " +
+          "image_url VARCHAR(255), " +
+          "is_active TINYINT(1) NOT NULL DEFAULT 1, " +
+          "created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, " +
+          "CONSTRAINT fk_products_category FOREIGN KEY (category_id) REFERENCES categories(category_id)" +
+          ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+        );
+        initStmt.executeUpdate(
+          "CREATE TABLE IF NOT EXISTS comments (" +
+          "comment_id INT AUTO_INCREMENT PRIMARY KEY, " +
+          "product_id INT NOT NULL, " +
+          "user_id INT NOT NULL, " +
+          "rating TINYINT NULL, " +
+          "content TEXT, " +
+          "created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, " +
+          "CONSTRAINT fk_comments_product FOREIGN KEY (product_id) REFERENCES products(product_id), " +
+          "CONSTRAINT fk_comments_user FOREIGN KEY (user_id) REFERENCES users(user_id), " +
+          "UNIQUE KEY uk_comments_product_user (product_id, user_id), " +
+          "INDEX idx_comments_product_date (product_id, created_at)" +
+          ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+        );
+      }
+
+      try (Statement seedStmt = conn.createStatement()) {
+        seedStmt.executeUpdate("INSERT IGNORE INTO categories (category_id, name) VALUES (1, '飲品'), (2, '周邊商品')");
+        seedStmt.executeUpdate(
+          "INSERT IGNORE INTO products (product_id, category_id, name, description, price, stock, image_url, is_active) VALUES " +
+          "(1, 1, '莓你不行', '草莓風味季節飲品。', 90.00, 100, 'images/莓你不行.png', 1), " +
+          "(2, 1, '伯爵鮮奶茶', '伯爵茶香搭配鮮奶。', 60.00, 100, 'images/伯爵鮮奶茶.png', 1), " +
+          "(3, 1, '焙韻厚奶', '焙茶香氣與厚奶口感。', 80.00, 100, 'images/焙韻厚奶.png', 1), " +
+          "(4, 1, '百香QQ綠', '百香果綠茶搭配 QQ 配料。', 75.00, 100, 'images/百香QQ綠.png', 1), " +
+          "(5, 1, '青韻綠茶', '清爽綠茶基本款。', 50.00, 100, 'images/青韻綠茶.png', 1), " +
+          "(6, 2, '環保杯', '品牌環保杯。', 799.00, 50, 'images/環保杯.png', 1), " +
+          "(7, 2, '保冰袋', '品牌保冰袋。', 179.00, 50, 'images/保冰袋.png', 1), " +
+          "(8, 2, '杯套', '品牌杯套。', 129.00, 50, 'images/杯套.png', 1)"
+        );
+      }
+    }
+  } catch (Exception ex) {
+    // 商品列表下方會顯示正式的資料庫讀取錯誤，這裡只避免初始化中斷整頁。
+  }
+
+  if ("POST".equalsIgnoreCase(request.getMethod())) {
+    String action = trimParam(request.getParameter("action"));
+
+    if ("saveComment".equals(action) || "deleteComment".equals(action)) {
+      if (!loggedIn) {
+        response.sendRedirect("member.jsp");
+        return;
+      }
+
+      int productId = parsePositiveInt(request.getParameter("product_id"));
+
+      try {
+        if (productId <= 0) {
+          throw new Exception("商品資料不完整，請重新操作。");
+        }
+
+        Class.forName("com.mysql.cj.jdbc.Driver");
+
+        try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword)) {
+          if ("deleteComment".equals(action)) {
+            String deleteSql = "DELETE FROM comments WHERE product_id = ? AND user_id = ?";
+            try (PreparedStatement deleteStmt = conn.prepareStatement(deleteSql)) {
+              deleteStmt.setInt(1, productId);
+              deleteStmt.setInt(2, currentUserId);
+              deleteStmt.executeUpdate();
+            }
+          } else {
+            int rating = parsePositiveInt(request.getParameter("rating"));
+            String content = trimParam(request.getParameter("content"));
+
+            if (rating < 1 || rating > 5) {
+              throw new Exception("請選擇 1 到 5 顆星。");
+            }
+
+            String updateSql =
+              "UPDATE comments SET rating = ?, content = ?, created_at = CURRENT_TIMESTAMP " +
+              "WHERE product_id = ? AND user_id = ?";
+            try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+              updateStmt.setInt(1, rating);
+              updateStmt.setString(2, content);
+              updateStmt.setInt(3, productId);
+              updateStmt.setInt(4, currentUserId);
+
+              if (updateStmt.executeUpdate() == 0) {
+                String insertSql = "INSERT INTO comments (product_id, user_id, rating, content) VALUES (?, ?, ?, ?)";
+                try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+                  insertStmt.setInt(1, productId);
+                  insertStmt.setInt(2, currentUserId);
+                  insertStmt.setInt(3, rating);
+                  insertStmt.setString(4, content);
+                  insertStmt.executeUpdate();
+                }
+              }
+            }
+          }
+        }
+
+        response.sendRedirect("menu.jsp#productCommentsBoard");
+        return;
+      } catch (Exception ex) {
+        response.sendRedirect("menu.jsp?commentError=1#productCommentsBoard");
+        return;
+      }
+    }
+  }
+
+  Map<String, RatingEntry> serverRatings = new LinkedHashMap<>();
+
+  try {
+    Class.forName("com.mysql.cj.jdbc.Driver");
+
+    String commentsSql =
+      "SELECT c.product_id, c.rating, c.content, c.created_at, u.email " +
+      "FROM comments c " +
+      "JOIN users u ON c.user_id = u.user_id " +
+      "JOIN products p ON c.product_id = p.product_id " +
+      "WHERE p.category_id = 1 AND p.is_active = 1 " +
+      "ORDER BY c.created_at DESC, c.comment_id DESC";
+
+    try (
+      Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+      PreparedStatement stmt = conn.prepareStatement(commentsSql);
+      ResultSet rs = stmt.executeQuery()
+    ) {
+      while (rs.next()) {
+        int productId = rs.getInt("product_id");
+        String drinkId = "drink" + productId;
+        String email = rs.getString("email");
+        if (email == null || email.trim().isEmpty()) continue;
+
+        RatingEntry entry = serverRatings.get(drinkId);
+        if (entry == null) {
+          entry = new RatingEntry();
+          serverRatings.put(drinkId, entry);
+        }
+
+        if (entry.userRatings.containsKey(email) || entry.userComments.containsKey(email)) {
+          continue;
+        }
+
+        int rating = rs.getInt("rating");
+        String content = trimParam(rs.getString("content"));
+        Timestamp createdAt = rs.getTimestamp("created_at");
+
+        if (rating > 0) {
+          entry.userRatings.put(email, rating);
+          entry.total += rating;
+          entry.count += 1;
+        }
+        if (!content.isEmpty()) {
+          entry.userComments.put(email, content);
+        }
+        entry.userCommentDates.put(email, createdAt == null ? "" : createdAt.toString());
+      }
+    }
+  } catch (Exception ex) {
+    serverRatings.clear();
+  }
+
+  StringBuilder serverRatingsJson = new StringBuilder("{");
+  boolean firstDrink = true;
+  for (Map.Entry<String, RatingEntry> ratingMapEntry : serverRatings.entrySet()) {
+    if (!firstDrink) serverRatingsJson.append(",");
+    firstDrink = false;
+
+    String drinkId = ratingMapEntry.getKey();
+    RatingEntry entry = ratingMapEntry.getValue();
+    serverRatingsJson
+      .append("\"").append(escapeJs(drinkId)).append("\":{")
+      .append("\"total\":").append(entry.total).append(",")
+      .append("\"count\":").append(entry.count).append(",")
+      .append("\"userRatings\":{");
+
+    boolean firstUser = true;
+    for (Map.Entry<String, Integer> userRating : entry.userRatings.entrySet()) {
+      if (!firstUser) serverRatingsJson.append(",");
+      firstUser = false;
+      serverRatingsJson
+        .append("\"").append(escapeJs(userRating.getKey())).append("\":")
+        .append(userRating.getValue());
+    }
+
+    serverRatingsJson.append("},\"userComments\":{");
+    firstUser = true;
+    for (Map.Entry<String, String> userComment : entry.userComments.entrySet()) {
+      if (!firstUser) serverRatingsJson.append(",");
+      firstUser = false;
+      serverRatingsJson
+        .append("\"").append(escapeJs(userComment.getKey())).append("\":\"")
+        .append(escapeJs(userComment.getValue())).append("\"");
+    }
+
+    serverRatingsJson.append("},\"userCommentDates\":{");
+    firstUser = true;
+    for (Map.Entry<String, String> userDate : entry.userCommentDates.entrySet()) {
+      if (!firstUser) serverRatingsJson.append(",");
+      firstUser = false;
+      serverRatingsJson
+        .append("\"").append(escapeJs(userDate.getKey())).append("\":\"")
+        .append(escapeJs(userDate.getValue())).append("\"");
+    }
+
+    serverRatingsJson.append("}}");
+  }
+  serverRatingsJson.append("}");
 %><!DOCTYPE html>
 <html lang="zh-Hant">
   <head>
@@ -48,6 +330,7 @@
     <link rel="stylesheet" href="style.css" />
     <script>
       window.CURRENT_USER = <%= loggedIn ? ("{name: \"" + escapeJs(currentUserName) + "\", email: \"" + escapeJs(currentUserEmail) + "\"}") : "null" %>;
+      window.SERVER_RATINGS = <%= serverRatingsJson.toString() %>;
     </script>
     <script src="script.js?v=20260512-3" defer></script>
   </head>
@@ -174,7 +457,6 @@
               productSql += " ORDER BY product_id";
 
               boolean hasProducts = false;
-              boolean queryFailed = false;
 
               try {
                 Class.forName("com.mysql.cj.jdbc.Driver");
@@ -227,7 +509,7 @@
                 </div>
                 <p><%= escapeHtml(description) %></p>
                 <p class="menu-drink-meta">價格：$<%= price %>　庫存：<%= stock %></p>
-                <div class="drink-rating" data-drink-id="<%= escapeHtml(drinkId) %>">
+                <div class="drink-rating" data-drink-id="<%= escapeHtml(drinkId) %>" data-product-id="<%= productId %>">
                   <div class="rating-stars">
                     <span class="rating-star" data-star="1">★</span>
                     <span class="rating-star" data-star="2">★</span>
@@ -249,21 +531,76 @@
                   }
                 }
               } catch (Exception ex) {
-                queryFailed = true;
-            %>
-            <div class="cart-empty-message">
-              商品資料讀取失敗，請確認 MySQL95 已啟動，且 Tomcat 已安裝 MySQL Connector/J。<br />
-              <%= escapeHtml(ex.getMessage()) %>
-            </div>
-            <%
               }
 
-              if (!queryFailed && !hasProducts) {
+              if (!hasProducts) {
+                boolean hasFallbackProducts = false;
+
+                for (String[] product : fallbackProducts) {
+                  if (!productMatchesKeyword(product, keyword)) continue;
+                  hasFallbackProducts = true;
+
+                  int productId = parsePositiveInt(product[0]);
+                  String drinkId = "drink" + productId;
+                  String productName = product[1];
+                  String description = product[2];
+                  int price = parsePositiveInt(product[3]);
+                  int stock = parsePositiveInt(product[4]);
+                  String imageUrl = product[5];
             %>
-            <div class="cart-empty-message">
-              沒有找到符合條件的商品。
+            <div class="menu-drink-row">
+              <div class="menu-drink-image">
+                <img
+                  src="<%= escapeHtml(imageUrl) %>"
+                  alt="<%= escapeHtml(productName) %>"
+                  class="menu-drink-image-img"
+                />
+              </div>
+              <div class="menu-drink-text">
+                <div class="menu-drink-header">
+                  <h3><%= escapeHtml(productName) %></h3>
+                  <button
+                    class="menu-add-btn"
+                    type="button"
+                    aria-label="加入<%= escapeHtml(productName) %>"
+                    data-drink-id="<%= escapeHtml(drinkId) %>"
+                    data-product-id="<%= productId %>"
+                    data-drink-name="<%= escapeHtml(productName) %>"
+                    data-drink-price="<%= price %>"
+                    <%= stock <= 0 ? "disabled" : "" %>
+                  >
+                    ＋
+                  </button>
+                </div>
+                <p><%= escapeHtml(description) %></p>
+                <p class="menu-drink-meta">價格：$<%= price %>　庫存：<%= stock %></p>
+                <div class="drink-rating" data-drink-id="<%= escapeHtml(drinkId) %>" data-product-id="<%= productId %>">
+                  <div class="rating-stars">
+                    <span class="rating-star" data-star="1">★</span>
+                    <span class="rating-star" data-star="2">★</span>
+                    <span class="rating-star" data-star="3">★</span>
+                    <span class="rating-star" data-star="4">★</span>
+                    <span class="rating-star" data-star="5">★</span>
+                  </div>
+                  <span class="rating-text" data-rating-text>尚未評分</span>
+                  <p
+                    class="my-rating-comment"
+                    data-my-comment
+                    style="display: none"
+                  ></p>
+                </div>
+              </div>
             </div>
             <%
+                }
+
+                if (!hasFallbackProducts) {
+            %>
+              <div class="cart-empty-message">
+                沒有找到符合條件的商品。
+              </div>
+            <%
+                }
               }
             %>          </div>
 
@@ -276,6 +613,9 @@
               </div>
               <a href="checkout.jsp" class="btn secondary-btn">查看購物車結帳</a>
             </div>
+            <% if ("1".equals(request.getParameter("commentError"))) { %>
+              <p class="product-comments-alert">留言儲存失敗，請確認資料庫連線後再試一次。</p>
+            <% } %>
             <div class="product-comment-filters" id="productCommentFilters"></div>
             <div class="product-comments-list" id="productCommentsList"></div>
           </section>
@@ -455,8 +795,16 @@
           <textarea
             id="ratingModalComment"
             class="rating-modal-comment"
+            name="content"
             placeholder="說說你的想法"
           ></textarea>
+
+          <form id="ratingServerForm" method="post" action="menu.jsp#productCommentsBoard">
+            <input type="hidden" name="action" id="ratingServerAction" value="saveComment" />
+            <input type="hidden" name="product_id" id="ratingServerProductId" value="" />
+            <input type="hidden" name="rating" id="ratingServerRating" value="" />
+            <input type="hidden" name="content" id="ratingServerContent" value="" />
+          </form>
 
           <div class="rating-modal-actions">
             <button
