@@ -50,7 +50,7 @@
           <div class="container story-block">
             <div class="story-image">
             <div class="story-image-photo"
-                style="background-image: url('images/環保杯.png');">
+                style="background-image: url('images/reusable-cup.png');">
             </div>
             </div>
 
@@ -68,7 +68,7 @@
           <div class="container story-block story-block-reverse">
             <div class="story-image">
             <div class="story-image-photo"
-                style="background-image: url('images/保冰袋.png');">
+                style="background-image: url('images/insulated-bag.png');">
             </div>
             </div>
 
@@ -86,7 +86,7 @@
           <div class="container story-block">
             <div class="story-image">
             <div class="story-image-photo"
-                style="background-image: url('images/杯套.png');">
+                style="background-image: url('images/cup-sleeve.png');">
             </div>
             </div>
 

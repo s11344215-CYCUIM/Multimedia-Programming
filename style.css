@@ -783,7 +783,7 @@ body.page-leave {
   border: none;
 
   background-color: var(--color-primary);
-  background-image: url("images/葉子箭頭.png");
+  background-image: url("images/leaf-arrow.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100%;        /* 控制圖大小 */

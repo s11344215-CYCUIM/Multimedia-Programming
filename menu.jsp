@@ -126,11 +126,11 @@
   Integer currentUserId = (Integer) session.getAttribute("userId");
   boolean loggedIn = currentUserId != null;
   String[][] fallbackProducts = {
-    { "1", "莓你不行", "草莓風味季節飲品。", "90", "100", "images/莓你不行.png" },
-    { "2", "伯爵鮮奶茶", "伯爵茶香搭配鮮奶。", "60", "100", "images/伯爵鮮奶茶.png" },
-    { "3", "焙韻厚奶", "焙茶香氣與厚奶口感。", "80", "100", "images/焙韻厚奶.png" },
-    { "4", "百香QQ綠", "百香果綠茶搭配 QQ 配料。", "75", "100", "images/百香QQ綠.png" },
-    { "5", "青韻綠茶", "清爽綠茶基本款。", "50", "100", "images/青韻綠茶.png" }
+    { "1", "莓你不行", "草莓風味季節飲品。", "90", "100", "images/strawberry-tea.png" },
+    { "2", "伯爵鮮奶茶", "伯爵茶香搭配鮮奶。", "60", "100", "images/earl-grey-milk-tea.png" },
+    { "3", "焙韻厚奶", "焙茶香氣與厚奶口感。", "80", "100", "images/roasted-milk-tea.png" },
+    { "4", "百香QQ綠", "百香果綠茶搭配 QQ 配料。", "75", "100", "images/passion-fruit-qq-green-tea.png" },
+    { "5", "青韻綠茶", "清爽綠茶基本款。", "50", "100", "images/green-tea.png" }
   };
 
   try {
@@ -197,14 +197,14 @@
         seedStmt.executeUpdate("INSERT IGNORE INTO categories (category_id, name) VALUES (1, '飲品'), (2, '周邊商品')");
         seedStmt.executeUpdate(
           "INSERT IGNORE INTO products (product_id, category_id, name, description, price, stock, image_url, is_active) VALUES " +
-          "(1, 1, '莓你不行', '草莓風味季節飲品。', 90.00, 100, 'images/莓你不行.png', 1), " +
-          "(2, 1, '伯爵鮮奶茶', '伯爵茶香搭配鮮奶。', 60.00, 100, 'images/伯爵鮮奶茶.png', 1), " +
-          "(3, 1, '焙韻厚奶', '焙茶香氣與厚奶口感。', 80.00, 100, 'images/焙韻厚奶.png', 1), " +
-          "(4, 1, '百香QQ綠', '百香果綠茶搭配 QQ 配料。', 75.00, 100, 'images/百香QQ綠.png', 1), " +
-          "(5, 1, '青韻綠茶', '清爽綠茶基本款。', 50.00, 100, 'images/青韻綠茶.png', 1), " +
-          "(6, 2, '環保杯', '品牌環保杯。', 799.00, 50, 'images/環保杯.png', 1), " +
-          "(7, 2, '保冰袋', '品牌保冰袋。', 179.00, 50, 'images/保冰袋.png', 1), " +
-          "(8, 2, '杯套', '品牌杯套。', 129.00, 50, 'images/杯套.png', 1)"
+          "(1, 1, '莓你不行', '草莓風味季節飲品。', 90.00, 100, 'images/strawberry-tea.png', 1), " +
+          "(2, 1, '伯爵鮮奶茶', '伯爵茶香搭配鮮奶。', 60.00, 100, 'images/earl-grey-milk-tea.png', 1), " +
+          "(3, 1, '焙韻厚奶', '焙茶香氣與厚奶口感。', 80.00, 100, 'images/roasted-milk-tea.png', 1), " +
+          "(4, 1, '百香QQ綠', '百香果綠茶搭配 QQ 配料。', 75.00, 100, 'images/passion-fruit-qq-green-tea.png', 1), " +
+          "(5, 1, '青韻綠茶', '清爽綠茶基本款。', 50.00, 100, 'images/green-tea.png', 1), " +
+          "(6, 2, '環保杯', '品牌環保杯。', 799.00, 50, 'images/reusable-cup.png', 1), " +
+          "(7, 2, '保冰袋', '品牌保冰袋。', 179.00, 50, 'images/insulated-bag.png', 1), " +
+          "(8, 2, '杯套', '品牌杯套。', 129.00, 50, 'images/cup-sleeve.png', 1)"
         );
       }
     }
@@ -438,7 +438,7 @@
           >
             <article class="rank-card">
               <img
-                src="images/焙韻厚奶.png"
+                src="images/roasted-milk-tea.png"
                 alt="焙韻厚奶"
                 class="menu-drink-image-img"
               />
@@ -451,7 +451,7 @@
 
             <article class="rank-card">
               <img
-                src="images/百香QQ綠.png"
+                src="images/passion-fruit-qq-green-tea.png"
                 alt="百香QQ綠"
                 class="menu-drink-image-img"
               />
@@ -464,7 +464,7 @@
 
             <article class="rank-card">
               <img
-                src="images/伯爵鮮奶茶.png"
+                src="images/earl-grey-milk-tea.png"
                 alt="伯爵鮮奶茶"
                 class="menu-drink-image-img"
               />

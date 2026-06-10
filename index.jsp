@@ -126,27 +126,27 @@
 
                 <!-- 第1則廣告 -->
                 <article class="ad-slide active" data-link="menu.jsp">
-                    <img src="images/莓你不行廣告.jpg" alt="莓你不行廣告" class="ad-image" />
+                    <img src="images/strawberry-tea-ad.jpg" alt="莓你不行廣告" class="ad-image" />
                 </article>
 
                 <!-- 第2則廣告 -->
                 <article class="ad-slide" data-link="menu.jsp">
-                    <img src="images/焙韻厚奶廣告.jpg" alt="焙韻厚奶廣告" class="ad-image" />
+                    <img src="images/roasted-milk-tea-ad.jpg" alt="焙韻厚奶廣告" class="ad-image" />
                 </article>
 
                 <!-- 第3則廣告 -->
                 <article class="ad-slide" data-link="menu.jsp">
-                    <img src="images/線上點餐廣告.jpg" alt="線上點餐廣告" class="ad-image" />
+                    <img src="images/online-ordering-ad.jpg" alt="線上點餐廣告" class="ad-image" />
                 </article>
 
                 <!-- 第4則廣告 -->
                 <article class="ad-slide" data-link="member.jsp">
-                    <img src="images/會員集點廣告.jpg" alt="會員集點廣告" class="ad-image" />
+                    <img src="images/member-rewards-ad.jpg" alt="會員集點廣告" class="ad-image" />
                 </article>
 
                 <!-- 第5則廣告 -->
                 <article class="ad-slide" data-link="#franchise">
-                    <img src="images/加盟招募廣告.jpg" alt="加盟招募廣告" class="ad-image" />
+                    <img src="images/franchise-recruitment-ad.jpg" alt="加盟招募廣告" class="ad-image" />
                 </article>
             </div>
 
@@ -205,7 +205,7 @@
             <div class="container limited-grid">
                 <div class="limited-image-card">
                     <img
-                        src="images/莓你不行廣告.jpg"
+                        src="images/strawberry-tea-ad.jpg"
                         alt="季節限定飲品｜莓你不行"
                         class="limited-image"
                     />
@@ -248,7 +248,7 @@
             <div class="story-image">
             <div
                 class="story-image-photo"
-                style="background-image: url('images/品牌故事1.jpg');"
+                style="background-image: url('images/brand-story-1.jpg');"
             ></div>
             </div>
                 <div class="story-text">
@@ -267,7 +267,7 @@
             <div class="story-image">
             <div
                 class="story-image-photo"
-                style="background-image: url('images/品牌故事2.png');"
+                style="background-image: url('images/brand-story-2.png');"
             ></div>
             </div>
                 <div class="story-text">
@@ -333,7 +333,7 @@
                 <article class="team-card">
                     <div
                         class="team-photo"
-                        style="background-image: url('images/鄧宇珊照片.jpg');"
+                        style="background-image: url('images/team-yushan-deng.jpg');"
                     ></div>
                     <div class="team-name">鄧宇珊</div>
                     <div class="team-role">架構設計/廣告設計</div>
@@ -346,7 +346,7 @@
                 <article class="team-card">
                     <div
                         class="team-photo"
-                        style="background-image: url('images/曾雅婷照片.jpg');"
+                        style="background-image: url('images/team-yating-zeng.jpg');"
                     ></div>
                     <div class="team-name">曾雅婷</div>
                     <div class="team-role">架構設計/產品設計</div>
@@ -359,7 +359,7 @@
                 <article class="team-card">
                     <div
                         class="team-photo"
-                        style="background-image: url('images/謝佳璇照片.jpg');"
+                        style="background-image: url('images/team-jiaxuan-xie.jpg');"
                     ></div>
                     <div class="team-name">謝佳璇</div>
                     <div class="team-role">創始故事/品牌理念/品牌主旨/購物流程圖</div>
@@ -372,7 +372,7 @@
                 <article class="team-card">
                     <div
                         class="team-photo"
-                        style="background-image: url('images/張碩恩照片.jpg');"
+                        style="background-image: url('images/team-shuoen-zhang.jpg');"
                     ></div>
                     <div class="team-name">張碩恩</div>
                     <div class="team-role">前端互動/功能整合/介面調校</div>
@@ -465,7 +465,7 @@
 
         <a href="merch.jsp" class="promo-modal-link">
         <img
-            src="images/彈窗廣告.jpg"
+            src="images/popup-merch-ad.jpg"
             alt="周邊商品廣告"
             class="promo-modal-image"
         />
