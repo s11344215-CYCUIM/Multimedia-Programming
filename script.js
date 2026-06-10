@@ -1,8 +1,5 @@
 ﻿// ===========================
-// 漢堡選單開關（全尺寸共用）
-// - 點漢堡：切換 .open
-// - 點選單項目：收起
-// - 點畫面其他地方 / 按 ESC：收起
+// 漢堡選單開關
 // ===========================
 const navToggle = document.getElementById("navToggle");
 const mainNav = document.getElementById("mainNav");
@@ -12,16 +9,14 @@ if (navToggle && mainNav) {
   const toggleNav = () => mainNav.classList.toggle("open");
 
   navToggle.addEventListener("click", (e) => {
-    e.stopPropagation(); // 避免被外部點擊事件立刻關掉
+    e.stopPropagation();
     toggleNav();
   });
 
-  // 點到選單連結：收起
   mainNav.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", () => closeNav());
   });
 
-  // 點到頁面其他地方：收起
   document.addEventListener("click", (e) => {
     if (!mainNav.classList.contains("open")) return;
     const clickedInside =
@@ -29,7 +24,6 @@ if (navToggle && mainNav) {
     if (!clickedInside) closeNav();
   });
 
-  // 按 ESC：收起
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeNav();
   });

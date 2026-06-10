@@ -78,7 +78,6 @@
     <!-- 網頁分頁名稱和logo圖示 -->
     <title>首頁 - 檢茶官</title>
     <link rel="icon" href="images/logo.png" type="image/png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <script src="script.js?v=20260512-3" defer></script>
 </head>
@@ -127,61 +126,26 @@
 
                 <!-- 第1則廣告 -->
                 <article class="ad-slide active" data-link="menu.jsp">
-                    <!--  
-                    <div class="ad-tag">最新活動</div>
-                    <h3 class="ad-title">最新活動的標題</h3>
-                    <p class="ad-text">
-                        想不到有啥最新活動，內容可以打在這
-                    </p>
-                    -->
                     <img src="images/莓你不行廣告.jpg" alt="莓你不行廣告" class="ad-image" />
                 </article>
 
                 <!-- 第2則廣告 -->
                 <article class="ad-slide" data-link="menu.jsp">
-                    <!--
-                    <div class="ad-tag">人氣推薦</div>
-                    <h3 class="ad-title">人氣推薦的飲料</h3>
-                    <p class="ad-text">
-                        人氣飲料的內容
-                    </p>
-                    -->
                     <img src="images/焙韻厚奶廣告.jpg" alt="焙韻厚奶廣告" class="ad-image" />
                 </article>
 
                 <!-- 第3則廣告 -->
                 <article class="ad-slide" data-link="menu.jsp">
-                    <!--
-                    <div class="ad-tag">會員福利</div>
-                    <h3 class="ad-title">會員福利的標題</h3>
-                    <p class="ad-text">
-                        我不知道有啥福利
-                    </p>
-                    -->
                     <img src="images/線上點餐廣告.jpg" alt="線上點餐廣告" class="ad-image" />
                 </article>
 
                 <!-- 第4則廣告 -->
                 <article class="ad-slide" data-link="member.jsp">
-                    <!--
-                    <div class="ad-tag">想不到了</div>
-                    <h3 class="ad-title">想不到了</h3>
-                    <p class="ad-text">
-                        想不到了
-                    </p>
-                    -->
                     <img src="images/會員集點廣告.jpg" alt="會員集點廣告" class="ad-image" />
                 </article>
 
                 <!-- 第5則廣告 -->
                 <article class="ad-slide" data-link="#franchise">
-                    <!--
-                    <div class="ad-tag">不知道寫啥</div>
-                    <h3 class="ad-title">想不到了</h3>
-                    <p class="ad-text">
-                        想不到了
-                    </p>
-                    -->
                     <img src="images/加盟招募廣告.jpg" alt="加盟招募廣告" class="ad-image" />
                 </article>
             </div>
@@ -239,7 +203,6 @@
             </div>
 
             <div class="container limited-grid">
-                <!-- 假圖片框（之後可換成 <img>） -->
                 <div class="limited-image-card">
                     <img
                         src="images/莓你不行廣告.jpg"

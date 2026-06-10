@@ -242,7 +242,6 @@
     <!-- 網頁分頁名稱和logo圖示 -->
     <title>結帳資訊 - 檢茶官</title>
     <link rel="icon" href="images/logo.png" type="image/png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
     <script src="script.js?v=20260512-3" defer></script>
   </head>

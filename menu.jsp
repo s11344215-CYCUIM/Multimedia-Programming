@@ -52,6 +52,64 @@
     return product[1].toLowerCase().contains(loweredKeyword) ||
       product[2].toLowerCase().contains(loweredKeyword);
   }
+
+  private String renderDrinkRow(
+    int productId,
+    String drinkId,
+    String productName,
+    String description,
+    int price,
+    int stock,
+    String imageUrl
+  ) {
+    String escapedName = escapeHtml(productName);
+    String escapedDrinkId = escapeHtml(drinkId);
+    String disabledAttr = stock <= 0 ? " disabled" : "";
+
+    return
+      "            <div class=\"menu-drink-row\">\n" +
+      "              <div class=\"menu-drink-image\">\n" +
+      "                <img\n" +
+      "                  src=\"" + escapeHtml(imageUrl) + "\"\n" +
+      "                  alt=\"" + escapedName + "\"\n" +
+      "                  class=\"menu-drink-image-img\"\n" +
+      "                />\n" +
+      "              </div>\n" +
+      "              <div class=\"menu-drink-text\">\n" +
+      "                <div class=\"menu-drink-header\">\n" +
+      "                  <h3>" + escapedName + "</h3>\n" +
+      "                  <button\n" +
+      "                    class=\"menu-add-btn\"\n" +
+      "                    type=\"button\"\n" +
+      "                    aria-label=\"加入" + escapedName + "\"\n" +
+      "                    data-drink-id=\"" + escapedDrinkId + "\"\n" +
+      "                    data-product-id=\"" + productId + "\"\n" +
+      "                    data-drink-name=\"" + escapedName + "\"\n" +
+      "                    data-drink-price=\"" + price + "\"" + disabledAttr + "\n" +
+      "                  >\n" +
+      "                    ＋\n" +
+      "                  </button>\n" +
+      "                </div>\n" +
+      "                <p>" + escapeHtml(description) + "</p>\n" +
+      "                <p class=\"menu-drink-meta\">價格：$" + price + "　庫存：" + stock + "</p>\n" +
+      "                <div class=\"drink-rating\" data-drink-id=\"" + escapedDrinkId + "\" data-product-id=\"" + productId + "\">\n" +
+      "                  <div class=\"rating-stars\">\n" +
+      "                    <span class=\"rating-star\" data-star=\"1\">★</span>\n" +
+      "                    <span class=\"rating-star\" data-star=\"2\">★</span>\n" +
+      "                    <span class=\"rating-star\" data-star=\"3\">★</span>\n" +
+      "                    <span class=\"rating-star\" data-star=\"4\">★</span>\n" +
+      "                    <span class=\"rating-star\" data-star=\"5\">★</span>\n" +
+      "                  </div>\n" +
+      "                  <span class=\"rating-text\" data-rating-text>尚未評分</span>\n" +
+      "                  <p\n" +
+      "                    class=\"my-rating-comment\"\n" +
+      "                    data-my-comment\n" +
+      "                    style=\"display: none\"\n" +
+      "                  ></p>\n" +
+      "                </div>\n" +
+      "              </div>\n" +
+      "            </div>\n";
+  }
 %>
 <%
   request.setCharacterEncoding("UTF-8");
@@ -326,8 +384,6 @@
     <!-- 網頁分頁名稱和logo圖示 -->
     <title>飲品菜單 - 檢茶官</title>
     <link rel="icon" href="images/logo.png" type="image/png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <link rel="stylesheet" href="style.css" />
     <script>
       window.CURRENT_USER = <%= loggedIn ? ("{name: \"" + escapeJs(currentUserName) + "\", email: \"" + escapeJs(currentUserEmail) + "\"}") : "null" %>;
@@ -484,49 +540,7 @@
                       int price = priceValue == null ? 0 : priceValue.intValue();
                       int stock = rs.getInt("stock");
             %>
-            <div class="menu-drink-row">
-              <div class="menu-drink-image">
-                <img
-                  src="<%= escapeHtml(imageUrl) %>"
-                  alt="<%= escapeHtml(productName) %>"
-                  class="menu-drink-image-img"
-                />
-              </div>
-              <div class="menu-drink-text">
-                <div class="menu-drink-header">
-                  <h3><%= escapeHtml(productName) %></h3>
-                  <button
-                    class="menu-add-btn"
-                    type="button"
-                    aria-label="加入<%= escapeHtml(productName) %>"
-                    data-drink-id="<%= escapeHtml(drinkId) %>"
-                    data-product-id="<%= productId %>"
-                    data-drink-name="<%= escapeHtml(productName) %>"
-                    data-drink-price="<%= price %>"
-                    <%= stock <= 0 ? "disabled" : "" %>
-                  >
-                    ＋
-                  </button>
-                </div>
-                <p><%= escapeHtml(description) %></p>
-                <p class="menu-drink-meta">價格：$<%= price %>　庫存：<%= stock %></p>
-                <div class="drink-rating" data-drink-id="<%= escapeHtml(drinkId) %>" data-product-id="<%= productId %>">
-                  <div class="rating-stars">
-                    <span class="rating-star" data-star="1">★</span>
-                    <span class="rating-star" data-star="2">★</span>
-                    <span class="rating-star" data-star="3">★</span>
-                    <span class="rating-star" data-star="4">★</span>
-                    <span class="rating-star" data-star="5">★</span>
-                  </div>
-                  <span class="rating-text" data-rating-text>尚未評分</span>
-                  <p
-                    class="my-rating-comment"
-                    data-my-comment
-                    style="display: none"
-                  ></p>
-                </div>
-              </div>
-            </div>
+            <%= renderDrinkRow(productId, drinkId, productName, description, price, stock, imageUrl) %>
             <%
                     }
                   }
@@ -549,49 +563,7 @@
                   int stock = parsePositiveInt(product[4]);
                   String imageUrl = product[5];
             %>
-            <div class="menu-drink-row">
-              <div class="menu-drink-image">
-                <img
-                  src="<%= escapeHtml(imageUrl) %>"
-                  alt="<%= escapeHtml(productName) %>"
-                  class="menu-drink-image-img"
-                />
-              </div>
-              <div class="menu-drink-text">
-                <div class="menu-drink-header">
-                  <h3><%= escapeHtml(productName) %></h3>
-                  <button
-                    class="menu-add-btn"
-                    type="button"
-                    aria-label="加入<%= escapeHtml(productName) %>"
-                    data-drink-id="<%= escapeHtml(drinkId) %>"
-                    data-product-id="<%= productId %>"
-                    data-drink-name="<%= escapeHtml(productName) %>"
-                    data-drink-price="<%= price %>"
-                    <%= stock <= 0 ? "disabled" : "" %>
-                  >
-                    ＋
-                  </button>
-                </div>
-                <p><%= escapeHtml(description) %></p>
-                <p class="menu-drink-meta">價格：$<%= price %>　庫存：<%= stock %></p>
-                <div class="drink-rating" data-drink-id="<%= escapeHtml(drinkId) %>" data-product-id="<%= productId %>">
-                  <div class="rating-stars">
-                    <span class="rating-star" data-star="1">★</span>
-                    <span class="rating-star" data-star="2">★</span>
-                    <span class="rating-star" data-star="3">★</span>
-                    <span class="rating-star" data-star="4">★</span>
-                    <span class="rating-star" data-star="5">★</span>
-                  </div>
-                  <span class="rating-text" data-rating-text>尚未評分</span>
-                  <p
-                    class="my-rating-comment"
-                    data-my-comment
-                    style="display: none"
-                  ></p>
-                </div>
-              </div>
-            </div>
+            <%= renderDrinkRow(productId, drinkId, productName, description, price, stock, imageUrl) %>
             <%
                 }
 
@@ -610,7 +582,6 @@
               <div>
                 <p class="section-tag">REVIEWS</p>
                 <h2 class="menu-section-title">顧客留言</h2>
-                <p class="product-comments-sub">選擇已購買或想看的產品，最新留言會排在最左邊。</p>
               </div>
               <a href="checkout.jsp" class="btn secondary-btn">查看購物車結帳</a>
             </div>

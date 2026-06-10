@@ -513,8 +513,6 @@
     <meta charset="UTF-8" />
     <title>會員專區 - 檢茶官</title>
     <link rel="icon" href="images/logo.png" type="image/png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <link rel="stylesheet" href="style.css?v=20260610-1" />
     <script>
       window.CURRENT_USER = <%= loggedIn ? ("{name: \"" + escapeJs(currentUserName) + "\", email: \"" + escapeJs(currentUserEmail) + "\"}") : "null" %>;
