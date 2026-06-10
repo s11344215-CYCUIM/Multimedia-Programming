@@ -40,6 +40,18 @@
     }
     return extra;
   }
+
+  private void ensureMemberPointsColumn(Connection conn) throws SQLException {
+    try (ResultSet columns = conn.getMetaData().getColumns(null, null, "users", "member_points")) {
+      if (columns.next()) {
+        return;
+      }
+    }
+
+    try (Statement stmt = conn.createStatement()) {
+      stmt.executeUpdate("ALTER TABLE users ADD COLUMN member_points INT NOT NULL DEFAULT 0 AFTER role");
+    }
+  }
 %>
 <%
   request.setCharacterEncoding("UTF-8");
@@ -80,6 +92,7 @@
 
       Class.forName("com.mysql.cj.jdbc.Driver");
       conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+      ensureMemberPointsColumn(conn);
       conn.setAutoCommit(false);
 
       List<Object[]> orderItems = new ArrayList<>();
@@ -191,9 +204,22 @@
         itemStmt.executeBatch();
       }
 
+      int earnedPoints = totalAmount.divideToIntegralValue(new BigDecimal("30.00")).intValue();
+      if (currentUserId != null && earnedPoints > 0) {
+        String pointSql = "UPDATE users SET member_points = member_points + ? WHERE user_id = ?";
+        try (PreparedStatement pointStmt = conn.prepareStatement(pointSql)) {
+          pointStmt.setInt(1, earnedPoints);
+          pointStmt.setInt(2, currentUserId);
+          pointStmt.executeUpdate();
+        }
+      }
+
       conn.commit();
       orderSuccess = true;
       orderMessage = "訂單已建立，訂單編號：" + orderId + "，總金額 $" + totalAmount.intValue();
+      if (currentUserId != null) {
+        orderMessage += "，本次累積 " + earnedPoints + " 點會員點數";
+      }
     } catch (Exception ex) {
       if (conn != null) {
         try {

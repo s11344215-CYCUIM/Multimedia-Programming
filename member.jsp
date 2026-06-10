@@ -1,5 +1,6 @@
 ﻿<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.sql.*" %>
+<%@ page import="java.math.BigDecimal" %>
 <%!
   private String escapeHtml(String value) {
     if (value == null) return "";
@@ -25,6 +26,30 @@
 
   private String trimParam(String value) {
     return value == null ? "" : value.trim();
+  }
+
+  private int parseNonNegativeInt(String value, String fieldName) throws Exception {
+    try {
+      int parsed = Integer.parseInt(trimParam(value));
+      if (parsed < 0) {
+        throw new Exception(fieldName + "不能小於 0。");
+      }
+      return parsed;
+    } catch (NumberFormatException ex) {
+      throw new Exception("請輸入正確的" + fieldName + "。");
+    }
+  }
+
+  private BigDecimal parsePositivePrice(String value) throws Exception {
+    try {
+      BigDecimal price = new BigDecimal(trimParam(value));
+      if (price.compareTo(BigDecimal.ZERO) <= 0) {
+        throw new Exception("價格必須大於 0。");
+      }
+      return price;
+    } catch (NumberFormatException ex) {
+      throw new Exception("請輸入正確的價格。");
+    }
   }
 
   private String orderStatusLabel(String status) {
@@ -89,9 +114,11 @@
         "email VARCHAR(150) NOT NULL UNIQUE, " +
         "password VARCHAR(255) NOT NULL, " +
         "role VARCHAR(20) NOT NULL DEFAULT 'member', " +
+        "member_points INT NOT NULL DEFAULT 0, " +
         "created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP" +
         ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
       );
+      ensureMemberPointsColumn(conn);
       stmt.executeUpdate(
         "CREATE TABLE IF NOT EXISTS categories (" +
         "category_id INT AUTO_INCREMENT PRIMARY KEY, " +
@@ -141,6 +168,18 @@
       );
     }
   }
+
+  private void ensureMemberPointsColumn(Connection conn) throws SQLException {
+    try (ResultSet columns = conn.getMetaData().getColumns(null, null, "users", "member_points")) {
+      if (columns.next()) {
+        return;
+      }
+    }
+
+    try (Statement stmt = conn.createStatement()) {
+      stmt.executeUpdate("ALTER TABLE users ADD COLUMN member_points INT NOT NULL DEFAULT 0 AFTER role");
+    }
+  }
 %>
 <%
   request.setCharacterEncoding("UTF-8");
@@ -148,6 +187,7 @@
   String message = "";
   boolean messageOk = false;
   String activeAuthPanel = "loginPanel";
+  String activeAdminPanel = "inventory";
   String action = trimParam(request.getParameter("action"));
 
   if ("logout".equals(action)) {
@@ -349,6 +389,7 @@
         message = "會員資料已更新。";
         messageOk = true;
       } else if ("updateStock".equals(action)) {
+        activeAdminPanel = "inventory";
         String role = (String) session.getAttribute("userRole");
         if (!"admin".equals(role)) {
           throw new Exception("請先用管理者帳號登入。");
@@ -371,7 +412,49 @@
 
         message = "庫存已更新。";
         messageOk = true;
+      } else if ("addProduct".equals(action)) {
+        activeAdminPanel = "addProduct";
+        String role = (String) session.getAttribute("userRole");
+        if (!"admin".equals(role)) {
+          throw new Exception("請先用管理者帳號登入。");
+        }
+
+        String productName = trimParam(request.getParameter("productName"));
+        String description = trimParam(request.getParameter("description"));
+        BigDecimal price = parsePositivePrice(request.getParameter("price"));
+        int stock = parseNonNegativeInt(request.getParameter("stock"), "庫存");
+        String imageUrl = trimParam(request.getParameter("imageUrl"));
+        int isActive = "1".equals(request.getParameter("isActive")) ? 1 : 0;
+
+        if (productName.isEmpty()) {
+          throw new Exception("請輸入商品品名。");
+        }
+        if (description.isEmpty()) {
+          throw new Exception("請輸入商品描述。");
+        }
+        if (imageUrl.isEmpty()) {
+          imageUrl = "images/logo.png";
+        }
+
+        try (Connection conn = openDrinkShopConnection()) {
+          String insertSql =
+            "INSERT INTO products (category_id, name, description, price, stock, image_url, is_active) " +
+            "VALUES (1, ?, ?, ?, ?, ?, ?)";
+          try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+            insertStmt.setString(1, productName);
+            insertStmt.setString(2, description);
+            insertStmt.setBigDecimal(3, price);
+            insertStmt.setInt(4, stock);
+            insertStmt.setString(5, imageUrl);
+            insertStmt.setInt(6, isActive);
+            insertStmt.executeUpdate();
+          }
+        }
+
+        message = isActive == 1 ? "新飲品已新增並上架到飲品菜單。" : "新飲品已新增，目前尚未上架。";
+        messageOk = true;
       } else if ("updateOrderStatus".equals(action)) {
+        activeAdminPanel = "adminOrders";
         String role = (String) session.getAttribute("userRole");
         if (!"admin".equals(role)) {
           throw new Exception("請先用管理者帳號登入。");
@@ -407,6 +490,23 @@
   String currentUserRole = (String) session.getAttribute("userRole");
   boolean loggedIn = currentUserId != null;
   boolean adminLoggedIn = loggedIn && "admin".equals(currentUserRole);
+  int currentUserPoints = 0;
+
+  if (loggedIn && !adminLoggedIn) {
+    try (Connection conn = openDrinkShopConnection()) {
+      String pointSql = "SELECT member_points FROM users WHERE user_id = ?";
+      try (PreparedStatement pointStmt = conn.prepareStatement(pointSql)) {
+        pointStmt.setInt(1, currentUserId);
+        try (ResultSet rs = pointStmt.executeQuery()) {
+          if (rs.next()) {
+            currentUserPoints = rs.getInt("member_points");
+          }
+        }
+      }
+    } catch (Exception ignore) {
+      currentUserPoints = 0;
+    }
+  }
 %><!DOCTYPE html>
 <html lang="zh-Hant">
   <head>
@@ -611,11 +711,15 @@
               </div>
 
               <nav class="member-side-nav" aria-label="管理者功能">
-                <button type="button" class="member-side-link active" data-panel="inventory">
+                <button type="button" class="member-side-link <%= "inventory".equals(activeAdminPanel) ? "active" : "" %>" data-panel="inventory">
                   <span class="member-side-ico" aria-hidden="true">庫</span>
                   <span>產品庫存</span>
                 </button>
-                <button type="button" class="member-side-link" data-panel="adminOrders">
+                <button type="button" class="member-side-link <%= "addProduct".equals(activeAdminPanel) ? "active" : "" %>" data-panel="addProduct">
+                  <span class="member-side-ico" aria-hidden="true">＋</span>
+                  <span>新增商品</span>
+                </button>
+                <button type="button" class="member-side-link <%= "adminOrders".equals(activeAdminPanel) ? "active" : "" %>" data-panel="adminOrders">
                   <span class="member-side-ico" aria-hidden="true">單</span>
                   <span>訂單管理</span>
                 </button>
@@ -630,7 +734,7 @@
             </aside>
 
             <section class="member-main" aria-label="管理者內容">
-              <section class="member-panel active" data-panel="inventory">
+              <section class="member-panel <%= "inventory".equals(activeAdminPanel) ? "active" : "" %>" data-panel="inventory">
                 <h2>產品庫存管理</h2>
                 <p class="admin-panel-note">調整數量後按「更新庫存」，飲品頁會讀到新的庫存。</p>
                 <div class="admin-table">
@@ -678,7 +782,86 @@
                 </div>
               </section>
 
-              <section class="member-panel" data-panel="adminOrders">
+              <section class="member-panel <%= "addProduct".equals(activeAdminPanel) ? "active" : "" %>" data-panel="addProduct">
+                <h2>新增飲品商品</h2>
+                <p class="admin-panel-note">新增後若勾選立即上架，商品會出現在飲品菜單的全部飲品列表。</p>
+                <form class="member-form admin-product-form" method="post" action="member.jsp" data-backend-member="true">
+                  <input type="hidden" name="action" value="addProduct" />
+
+                  <div class="admin-form-grid">
+                    <div class="member-form-group">
+                      <label for="product-name">商品品名</label>
+                      <input
+                        type="text"
+                        id="product-name"
+                        name="productName"
+                        required
+                        maxlength="100"
+                        placeholder="例如：桂花烏龍鮮奶茶"
+                      />
+                    </div>
+
+                    <div class="member-form-group">
+                      <label for="product-price">價格</label>
+                      <input
+                        type="number"
+                        id="product-price"
+                        name="price"
+                        min="1"
+                        step="1"
+                        required
+                        placeholder="例如：75"
+                      />
+                    </div>
+
+                    <div class="member-form-group">
+                      <label for="product-stock">初始庫存</label>
+                      <input
+                        type="number"
+                        id="product-stock"
+                        name="stock"
+                        min="0"
+                        step="1"
+                        required
+                        placeholder="例如：100"
+                      />
+                    </div>
+
+                    <div class="member-form-group">
+                      <label for="product-image">圖片路徑</label>
+                      <input
+                        type="text"
+                        id="product-image"
+                        name="imageUrl"
+                        placeholder="例如：images/新品.png"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="member-form-group">
+                    <label for="product-description">商品描述</label>
+                    <textarea
+                      id="product-description"
+                      name="description"
+                      rows="4"
+                      required
+                      placeholder="輸入會顯示在飲品菜單上的介紹文字"
+                    ></textarea>
+                  </div>
+
+                  <label class="admin-check-option">
+                    <input type="checkbox" name="isActive" value="1" checked />
+                    <span>立即上架到飲品菜單</span>
+                  </label>
+
+                  <div class="admin-form-actions">
+                    <button type="submit" class="btn primary-btn member-submit-btn">新增商品</button>
+                    <a href="menu.jsp#menu-all" class="btn secondary-btn">查看飲品菜單</a>
+                  </div>
+                </form>
+              </section>
+
+              <section class="member-panel <%= "adminOrders".equals(activeAdminPanel) ? "active" : "" %>" data-panel="adminOrders">
                 <h2>訂單管理</h2>
                 <p class="admin-panel-note">可以檢視最新訂單，並把狀態改成處理中、可取餐或已完成。</p>
                 <div class="admin-order-list">
@@ -765,21 +948,9 @@
                   <span class="member-side-ico" aria-hidden="true">單</span>
                   <span>訂單紀錄</span>
                 </button>
-                <button type="button" class="member-side-link" data-panel="notice">
-                  <span class="member-side-ico" aria-hidden="true">訊</span>
-                  <span>通知中心</span>
-                </button>
-                <button type="button" class="member-side-link" data-panel="coupon">
-                  <span class="member-side-ico" aria-hidden="true">券</span>
-                  <span>優惠券</span>
-                </button>
                 <button type="button" class="member-side-link" data-panel="points">
                   <span class="member-side-ico" aria-hidden="true">點</span>
                   <span>會員點數</span>
-                </button>
-                <button type="button" class="member-side-link" data-panel="refund">
-                  <span class="member-side-ico" aria-hidden="true">退</span>
-                  <span>退貨退款</span>
                 </button>
               </nav>
 
@@ -877,37 +1048,17 @@
                 </div>
               </section>
 
-              <section class="member-panel" data-panel="notice">
-                <h2>通知中心</h2>
-                <div class="order-empty">
-                  <p class="order-empty-title">目前沒有新的通知</p>
-                </div>
-              </section>
-
-              <section class="member-panel" data-panel="coupon">
-                <h2>優惠券</h2>
-                <div class="order-empty">
-                  <p class="order-empty-title">目前沒有可使用的優惠券</p>
-                </div>
-              </section>
-
               <section class="member-panel" data-panel="points">
                 <h2>會員點數</h2>
                 <div class="checkout-summary-item">
                   <div class="checkout-summary-item-main">
                     <div class="checkout-summary-item-name">目前點數</div>
-                    <div class="checkout-summary-item-options">訂單完成後可依規則累積點數</div>
+                    <div class="checkout-summary-item-options">每消費 $30 可累積 1 點</div>
                   </div>
-                  <div class="checkout-summary-item-total">0 點</div>
+                  <div class="checkout-summary-item-total"><%= currentUserPoints %> 點</div>
                 </div>
               </section>
 
-              <section class="member-panel" data-panel="refund">
-                <h2>退貨退款</h2>
-                <div class="order-empty">
-                  <p class="order-empty-title">目前沒有退貨退款紀錄</p>
-                </div>
-              </section>
             </section>
           </div>
         </section>

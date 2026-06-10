@@ -2008,7 +2008,8 @@ body.modal-open .rating-modal-backdrop {
   color: #333;
 }
 
-.member-form-group input {
+.member-form-group input,
+.member-form-group textarea {
   width: 100%;
   margin-top: 0.25rem;
   border-radius: 12px;
@@ -2016,6 +2017,11 @@ body.modal-open .rating-modal-backdrop {
   padding: 0.6rem 0.7rem;
   font-family: inherit;
   font-size: 0.9rem;
+}
+
+.member-form-group textarea {
+  resize: vertical;
+  min-height: 110px;
 }
 
 .member-submit-btn {
@@ -2677,6 +2683,47 @@ body.modal-open .rating-modal-backdrop {
   margin: -0.2rem 0 1rem;
 }
 
+.admin-product-form {
+  max-width: 760px;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.admin-check-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+.admin-check-option input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+}
+
+.admin-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.admin-form-actions .btn {
+  justify-content: center;
+}
+
+.admin-form-actions .member-submit-btn {
+  width: auto;
+  min-width: 160px;
+  margin-top: 0;
+}
+
 .admin-table {
   display: grid;
   gap: 0.6rem;
@@ -2793,6 +2840,13 @@ body.modal-open .rating-modal-backdrop {
   .member-sidebar {
     position: static;
     top: auto;
+  }
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-form-actions .member-submit-btn,
+  .admin-form-actions .btn {
+    width: 100%;
   }
 }
 
