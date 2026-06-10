@@ -2029,6 +2029,20 @@ body.modal-open .rating-modal-backdrop {
   justify-content: center;
 }
 
+.member-sidebar .member-logout-btn:not(.admin-logout-btn) {
+  background: #ffffff;
+  border-color: rgba(var(--color-primary-rgb), 0.22);
+  color: var(--color-primary);
+  box-shadow: 0 10px 22px rgba(20, 68, 51, 0.06);
+}
+
+.member-sidebar .member-logout-btn:not(.admin-logout-btn):hover {
+  background: rgba(var(--color-primary-rgb), 0.08);
+  border-color: rgba(var(--color-primary-rgb), 0.38);
+  color: var(--color-primary);
+  transform: translateY(-1px);
+}
+
 /* ===========================
    飲品評分（列表上的）
 =========================== */
@@ -2632,6 +2646,11 @@ body.modal-open .rating-modal-backdrop {
   padding: 1.2rem 0.2rem 0.2rem;
 }
 
+.order-panel [hidden],
+.order-panel .is-order-hidden {
+  display: none !important;
+}
+
 .order-empty {
   border-radius: 18px;
   border: 1px dashed rgba(20, 68, 51, 0.22);
@@ -2710,6 +2729,20 @@ body.modal-open .rating-modal-backdrop {
 .admin-logout-btn {
   width: 100%;
   margin-top: 1.2rem;
+}
+
+.member-sidebar .member-normal-logout-btn {
+  background-color: #ffffff;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.32);
+  color: var(--color-primary);
+  box-shadow: 0 10px 22px rgba(20, 68, 51, 0.08);
+  opacity: 1;
+}
+
+.member-sidebar .member-normal-logout-btn:hover {
+  background-color: rgba(var(--color-primary-rgb), 0.08);
+  border-color: rgba(var(--color-primary-rgb), 0.46);
+  color: var(--color-primary);
 }
 
 .admin-small-btn {

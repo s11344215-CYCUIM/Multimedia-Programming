@@ -893,28 +893,48 @@ if (memberTabButtons.length) {
 // 會員中心：右側訂單 tab
 const orderTabs = document.querySelectorAll(".order-tab");
 if (orderTabs.length) {
-  const emptyTitle = document.querySelector(".order-empty-title");
+  const orderItems = document.querySelectorAll(".order-record");
+  const emptyState = document.querySelector(".order-filter-empty");
+  const emptyTitle = emptyState
+    ? emptyState.querySelector(".order-empty-title")
+    : document.querySelector(".order-empty-title");
 
   const tabLabelMap = {
     all: "尚未有訂單",
-    pay: "尚未有待付款的訂單",
-    ship: "尚未有待製作的訂單",
-    receive: "尚未有待取的訂單",
+    pending: "尚未有待處理的訂單",
     done: "尚未有已完成的訂單",
-    cancel: "尚未有取消的訂單",
-    refund: "尚未有退貨/退款的訂單",
+    cancel: "尚未有已取消的訂單",
   };
+
+  function filterOrders(statusKey) {
+    let visibleCount = 0;
+
+    orderItems.forEach((item) => {
+      const itemStatus = (item.dataset.orderStatus || "").trim();
+      const shouldShow = statusKey === "all" || itemStatus === statusKey;
+      item.classList.toggle("is-order-hidden", !shouldShow);
+      if (shouldShow) visibleCount += 1;
+    });
+
+    if (emptyTitle && tabLabelMap[statusKey]) {
+      emptyTitle.textContent = tabLabelMap[statusKey];
+    }
+
+    if (emptyState) {
+      emptyState.classList.toggle("is-order-hidden", visibleCount > 0);
+    }
+  }
 
   orderTabs.forEach((btn) => {
     btn.addEventListener("click", () => {
       orderTabs.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
-      const key = btn.dataset.orderTab;
-      if (emptyTitle && key && tabLabelMap[key]) {
-        emptyTitle.textContent = tabLabelMap[key];
-      }
+      filterOrders(btn.dataset.orderTab || "all");
     });
   });
+
+  const activeOrderTab = document.querySelector(".order-tab.active");
+  filterOrders(activeOrderTab ? activeOrderTab.dataset.orderTab || "all" : "all");
 }
 
 // 會員中心：編輯個人簡介（示意）

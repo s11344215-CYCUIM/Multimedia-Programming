@@ -27,6 +27,15 @@
     return value == null ? "" : value.trim();
   }
 
+  private String orderStatusLabel(String status) {
+    if ("pending".equals(status)) return "待處理";
+    if ("making".equals(status)) return "製作中";
+    if ("ready".equals(status)) return "可取餐";
+    if ("done".equals(status)) return "已完成";
+    if ("cancel".equals(status)) return "已取消";
+    return status == null || status.trim().isEmpty() ? "未更新" : status;
+  }
+
   private Connection openServerConnection() throws Exception {
     Class.forName("com.mysql.cj.jdbc.Driver");
 
@@ -406,11 +415,11 @@
     <link rel="icon" href="images/logo.png" type="image/png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=20260610-1" />
     <script>
       window.CURRENT_USER = <%= loggedIn ? ("{name: \"" + escapeJs(currentUserName) + "\", email: \"" + escapeJs(currentUserEmail) + "\"}") : "null" %>;
     </script>
-    <script src="script.js?v=20260512-3" defer></script>
+    <script src="script.js?v=20260610-1" defer></script>
   </head>
 
   <body>
@@ -776,7 +785,7 @@
 
               <form method="post" action="member.jsp" data-backend-member="true">
                 <input type="hidden" name="action" value="logout" />
-                <button type="submit" class="btn secondary-btn member-logout-btn" id="logoutBtn">
+                <button type="submit" class="btn secondary-btn member-logout-btn member-normal-logout-btn" id="logoutBtn">
                   登出
                 </button>
               </form>
@@ -816,7 +825,7 @@
                 <h2>訂單紀錄</h2>
                 <div class="order-tabs" role="tablist" aria-label="訂單狀態">
                   <button class="order-tab active" type="button" data-order-tab="all">全部</button>
-                  <button class="order-tab" type="button" data-order-tab="pay">待處理</button>
+                  <button class="order-tab" type="button" data-order-tab="pending">待處理</button>
                   <button class="order-tab" type="button" data-order-tab="done">已完成</button>
                   <button class="order-tab" type="button" data-order-tab="cancel">已取消</button>
                 </div>
@@ -824,6 +833,7 @@
                 <div class="order-panel" id="orderPanel">
                   <%
                     int orderCount = 0;
+                    boolean orderLoadFailed = false;
                     try {
                       try (Connection conn = openDrinkShopConnection()) {
                         String orderSql =
@@ -835,10 +845,10 @@
                             while (rs.next()) {
                               orderCount++;
                   %>
-                  <div class="checkout-summary-item">
+                  <div class="checkout-summary-item order-record" data-order-status="<%= escapeHtml(rs.getString("status")) %>">
                     <div class="checkout-summary-item-main">
                       <div class="checkout-summary-item-name">
-                        訂單 #<%= rs.getInt("order_id") %> - <%= escapeHtml(rs.getString("status")) %>
+                        訂單 #<%= rs.getInt("order_id") %> - <%= escapeHtml(orderStatusLabel(rs.getString("status"))) %>
                       </div>
                       <div class="checkout-summary-item-options">
                         取餐：<%= rs.getDate("pickup_date") %> <%= rs.getTime("pickup_time") %> /
@@ -854,19 +864,16 @@
                         }
                       }
                     } catch (Exception ex) {
+                      orderLoadFailed = true;
                   %>
                   <div class="order-empty">
                     <p class="order-empty-title">訂單讀取失敗：<%= escapeHtml(ex.getMessage()) %></p>
                   </div>
-                  <%
-                    }
-                    if (orderCount == 0) {
-                  %>
-                  <div class="order-empty">
+                  <% } %>
+                  <div class="order-empty order-filter-empty <%= (!orderLoadFailed && orderCount == 0) ? "" : "is-order-hidden" %>">
                     <div class="order-empty-illus" aria-hidden="true">單</div>
                     <p class="order-empty-title">目前尚未有訂單</p>
                   </div>
-                  <% } %>
                 </div>
               </section>
 
